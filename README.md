@@ -8,7 +8,7 @@ git clone https://github.com/BrinzaBezrukoff/tictactoe.git
 ```
 2. Navigate inside repo folder:
 ```
-cd tictactoe-master
+cd tictactoe
 ```
 3. Compile source:
 ```
