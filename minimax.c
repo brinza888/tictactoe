@@ -5,6 +5,17 @@
 #include "minimax.h"
 
 
+static int depthMode = MODE_EXPERT;
+
+int getMode() {
+    return depthMode;
+}
+
+void setMode(int value) {
+    depthMode = value;
+}
+
+
 struct cell new_cell(int row, int col) {
     struct cell new;
     new.row = row;
@@ -33,7 +44,6 @@ int get_moves(enum field map[SIZE][SIZE], struct cell **moves) {
     return count;
 }
 
-
 int minimax(enum field (*map)[SIZE][SIZE], int* row, int* col, enum field player, int depth) {
     *row = -1;
     *col = -1;
@@ -42,7 +52,7 @@ int minimax(enum field (*map)[SIZE][SIZE], int* row, int* col, enum field player
     if (winner != EMPTY) {
         return (winner == ZERO) ? 10 : -10;
     } 
-    if (is_draw(*map)) {
+    if (is_draw(*map) || (depthMode != 0 && depth > depthMode)) {
         return 0;
     }
 

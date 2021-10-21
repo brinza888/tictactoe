@@ -5,6 +5,7 @@
 #include "tictactoe.h"
 #include "minimax.h"
 
+
 const char loadingS[] = {'-', '\\', '|', '/'};
 
 void print_turn(enum field map[SIZE][SIZE], int turn, char ch) {
@@ -28,6 +29,24 @@ int main(int argc, char** argv){
     printf("Who is the first? [X/O]: ");
     scanf("%c", &current_ch);
     enum field current = char2field(current_ch);
+
+    char ai_mode_ch;
+    int ai_mode;
+    printf("AI mode?\n");
+    printf("Easy Medium Hard Expert [E/M/H/X]: ");
+    scanf("%*c%c", &ai_mode_ch);
+    switch (ai_mode_ch) {
+        case 'E': ai_mode = MODE_EASY; break;
+        case 'M': ai_mode = MODE_MEDIUM; break;
+        case 'H': ai_mode = MODE_HARD; break;
+        case 'X': ai_mode = MODE_EXPERT; break;
+        default:
+            printf("Incorrect mode specified!\n");
+            return 1;
+            break;
+    }
+
+    setMode(ai_mode);
     
     if (current == EMPTY) {
         printf("You may choose only X or O\n");
