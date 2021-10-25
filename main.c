@@ -6,14 +6,6 @@
 #include "minimax.h"
 
 
-const char loadingS[] = {'-', '\\', '|', '/'};
-
-void print_turn(enum field map[SIZE][SIZE], int turn, char ch) {
-    printf("===== %d TURN (%c) =====\n\n", turn, ch);
-    print_map(map);
-    printf("\n");
-}
-
 int main(int argc, char** argv){
     enum field map[SIZE][SIZE];
     
@@ -66,7 +58,9 @@ int main(int argc, char** argv){
 
         current_ch = field2char(current);  // get char representation of player
         
-        print_turn(map, turns_count, current_ch);  // print map and turn header
+        printf("===== %d TURN (%c) =====\n\n", turns_count, current_ch);
+        print_map(map);
+        printf("\n");
  
         if (current == CROSS) {  // Human turn
             ipt_r = OK;
@@ -86,7 +80,6 @@ int main(int argc, char** argv){
 
         map[row][column] = current;  // fill cell with player's symbol        
         
-        print_map(map);
         winner = check_winner(map);  // check winner
         
         if (winner != EMPTY) {  // if winner exists
