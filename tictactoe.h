@@ -22,8 +22,15 @@ enum field {
     ZERO
 };
 
+// cell structure
+typedef struct {
+    int row;
+    int col;
+} Cell;
+
 // service functions
 int randrange(int a, int b);
+Cell* new_cell(int row, int col);
 
 char field2char(enum field fld);
 enum field char2field(char ch);
@@ -37,7 +44,7 @@ enum field check_winner(enum field map[SIZE][SIZE]);
 enum bool is_draw(enum field map[SIZE][SIZE]);
 
 // turns functions
-void ai_rand_turn(enum field map[SIZE][SIZE], int* row, int* col);
+Cell* ai_rand_turn(enum field map[SIZE][SIZE]);
 int check_input(enum field map[SIZE][SIZE], int row, int col);
 
 #endif

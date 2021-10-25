@@ -5,6 +5,13 @@
 #include "tictactoe.h"
 
 
+Cell* create_cell(int row, int col) {
+    Cell* cl = (Cell*) malloc(sizeof(Cell));
+    cl->row = row;
+    cl->col = col;
+    return cl;
+}
+
 int randrange(int a, int b) {
     return rand() % (b - a + 1) + a;
 }
@@ -80,7 +87,7 @@ void print_map(enum field map[SIZE][SIZE]) {  // pretty print for map
     }
 }
 
-void ai_rand_turn(enum field map[SIZE][SIZE], int* row, int* col) {
+Cell* ai_rand_turn(enum field map[SIZE][SIZE]) {
     enum bool flag = FALSE;
     int cell_num, rw, cl;
     do {
@@ -89,8 +96,7 @@ void ai_rand_turn(enum field map[SIZE][SIZE], int* row, int* col) {
         cl = cell_num % SIZE;
         flag = (map[rw][cl] == EMPTY);
     } while (!flag);
-    *row = rw;
-    *col = cl;
+    return create_cell(rw, cl);
 }
 
 int check_input(enum field map[SIZE][SIZE], int row, int col) {
