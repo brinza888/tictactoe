@@ -12,7 +12,7 @@
 int getMode();
 void setMode(int value);
 
-int getMoves(FieldT map[SIZE][SIZE], Cell** moves, size_t* n);
+int getMoves(FieldT (*map)[SIZE][SIZE], Cell** moves, size_t* n);
 
 int minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth);
 

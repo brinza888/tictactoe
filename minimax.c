@@ -15,7 +15,7 @@ void setMode(int value) {
     depthMode = value;
 }
 
-int getMoves(FieldT map[SIZE][SIZE], Cell** moves, size_t* n) {
+int getMoves(FieldT (*map)[SIZE][SIZE], Cell** moves, size_t* n) {
     if (*n < 1 || *moves == NULL) {
         *n = sizeof(Cell);
         *moves = (Cell*) malloc(*n);
@@ -23,7 +23,7 @@ int getMoves(FieldT map[SIZE][SIZE], Cell** moves, size_t* n) {
     int count = 0;
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            if (map[i][j] != EMPTY) {
+            if ((*map)[i][j] != EMPTY) {
                 continue;
             }
             count++;
@@ -57,7 +57,7 @@ int minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth) {
     Cell* moves;
     int count = 0;
     size_t allocated = 0;
-    count = getMoves(*map, &moves, &allocated);
+    count = getMoves(map, &moves, &allocated);
 
     Cell* ch_move;
     int mnmx = (player == ZERO) ? -20 : 20;  // optimized value
