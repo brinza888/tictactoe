@@ -19,7 +19,7 @@ int randrange(int a, int b) {
 }
 
 
-char field2char(enum field fld) {  // get char representation for field
+char field2char(FieldT fld) {  // get char representation for field
     switch (fld) {
         case CROSS: return 'X'; break;
         case ZERO: return 'O'; break;
@@ -27,7 +27,7 @@ char field2char(enum field fld) {  // get char representation for field
     }
 }
 
-enum field char2field(char ch) {
+FieldT char2field(char ch) {
     switch (ch) {
         case 'X': return CROSS; break;
         case 'O': return ZERO; break;
@@ -36,7 +36,7 @@ enum field char2field(char ch) {
 }
 
 
-enum field check_winner(enum field map[SIZE][SIZE]) {
+FieldT check_winner(FieldT map[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {  // horizontal lines
         if (map[i][0] == map[i][1] && map[i][1] == map[i][2] && map[i][1] != EMPTY) {
             return map[i][1];
@@ -57,7 +57,7 @@ enum field check_winner(enum field map[SIZE][SIZE]) {
     return EMPTY;  // winner not found
 }
 
-bool is_draw(enum field map[SIZE][SIZE]) {
+bool is_draw(FieldT map[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (map[i][j] == EMPTY) {
@@ -68,7 +68,7 @@ bool is_draw(enum field map[SIZE][SIZE]) {
     return true;
 }   
 
-void print_map(enum field map[SIZE][SIZE]) {  // pretty print for map
+void print_map(FieldT map[SIZE][SIZE]) {  // pretty print for map
     printf("  ");
     for (int i = 0; i < SIZE; i++) {  // columns indices
         printf(" %d", i + 1);
@@ -91,7 +91,7 @@ void print_map(enum field map[SIZE][SIZE]) {  // pretty print for map
     }
 }
 
-Cell ai_rand_turn(enum field map[SIZE][SIZE]) {
+Cell ai_rand_turn(FieldT map[SIZE][SIZE]) {
     bool flag = false;
     int cell_num, rw, cl;
     do {
@@ -103,7 +103,7 @@ Cell ai_rand_turn(enum field map[SIZE][SIZE]) {
     return Cell_create(rw, cl);
 }
 
-InputCode check_input(enum field map[SIZE][SIZE], Cell turn) {
+InputCode check_input(FieldT map[SIZE][SIZE], Cell turn) {
     if (turn.row > SIZE - 1 || turn.row < 0 ||
         turn.col > SIZE - 1 || turn.col < 0)
     {
@@ -116,6 +116,6 @@ InputCode check_input(enum field map[SIZE][SIZE], Cell turn) {
     }
 }
 
-enum field switch_player(enum field current) {
+FieldT switch_player(FieldT current) {
     return (current == CROSS) ? ZERO : CROSS;
 }

@@ -21,7 +21,7 @@ int main(int argc, char** argv){
     char current_ch;  // current player char
     printf("Who is the first? [X/O]: ");
     scanf("%c", &current_ch);
-    enum field current = char2field(current_ch);
+    FieldT current = char2field(current_ch);
 
     char ai_mode_ch;
     int ai_mode;
@@ -51,7 +51,7 @@ int main(int argc, char** argv){
     Cell turn = Cell_create(-1, -1); // turn cell
     int ipt_r;  // result of cell input
 
-    enum field winner = EMPTY;
+    FieldT winner = EMPTY;
     bool is_running = true;
 
     while (is_running) {

@@ -15,7 +15,7 @@ void setMode(int value) {
     depthMode = value;
 }
 
-int getMoves(enum field map[SIZE][SIZE], Cell** moves, size_t* n) {
+int getMoves(FieldT map[SIZE][SIZE], Cell** moves, size_t* n) {
     if (*n < 1 || *moves == NULL) {
         *n = sizeof(Cell);
         *moves = (Cell*) malloc(*n);
@@ -42,11 +42,11 @@ int getMoves(enum field map[SIZE][SIZE], Cell** moves, size_t* n) {
 }
 
 
-int minimax(enum field (*map)[SIZE][SIZE], Cell* turn, enum field player, int depth) {
+int minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth) {
     turn->row = -1;
     turn->col = -1;
     
-    enum field winner = check_winner(*map);
+    FieldT winner = check_winner(*map);
     if (winner != EMPTY) {
         return (winner == ZERO) ? 10 : -10;
     } 
