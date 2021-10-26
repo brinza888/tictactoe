@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "tictactoe.h"
 
@@ -56,15 +57,15 @@ enum field check_winner(enum field map[SIZE][SIZE]) {
     return EMPTY;  // winner not found
 }
 
-enum bool is_draw(enum field map[SIZE][SIZE]) {
+bool is_draw(enum field map[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (map[i][j] == EMPTY) {
-                return FALSE;
+                return false;
             }
         }
     }
-    return TRUE;
+    return true;
 }   
 
 void print_map(enum field map[SIZE][SIZE]) {  // pretty print for map
@@ -91,7 +92,7 @@ void print_map(enum field map[SIZE][SIZE]) {  // pretty print for map
 }
 
 Cell ai_rand_turn(enum field map[SIZE][SIZE]) {
-    enum bool flag = FALSE;
+    bool flag = false;
     int cell_num, rw, cl;
     do {
         cell_num = randrange(0, SIZE*SIZE - 1);

@@ -1,6 +1,8 @@
 #ifndef TICTACTOE
 #define TICTACTOE
 
+#include <stdbool.h>
+
 // size of game map
 #define SIZE 3  // cant be changed!
 
@@ -11,11 +13,6 @@ typedef enum InputCode {
     NOTEMPTY
 } InputCode;
 
-// boolean values
-enum bool {
-    FALSE,
-    TRUE
-};
 
 // cell type or player type
 typedef enum field {
@@ -47,7 +44,7 @@ void print_map(enum field map[SIZE][SIZE]);
 
 // checks functions
 enum field check_winner(enum field map[SIZE][SIZE]);
-enum bool is_draw(enum field map[SIZE][SIZE]);
+bool is_draw(enum field map[SIZE][SIZE]);
 
 // turns functions
 Cell ai_rand_turn(enum field map[SIZE][SIZE]);

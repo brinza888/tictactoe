@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "tictactoe.h"
 #include "minimax.h"
@@ -51,7 +52,7 @@ int main(int argc, char** argv){
     int ipt_r;  // result of cell input
 
     enum field winner = EMPTY;
-    enum bool is_running = TRUE;
+    bool is_running = true;
 
     while (is_running) {
         system("clear");  // clear last output
