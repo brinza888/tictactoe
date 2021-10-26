@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "tictactoe.h"
-#include "minimax.h"
+#include "ai.h"
 
 
 static int depthMode = MODE_EXPERT;

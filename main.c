@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #include "tictactoe.h"
-#include "minimax.h"
+#include "ai.h"
 
 
 int main(int argc, char** argv){
