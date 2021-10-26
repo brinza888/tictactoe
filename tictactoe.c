@@ -5,16 +5,18 @@
 #include "tictactoe.h"
 
 
-Cell* create_cell(int row, int col) {
-    Cell* cl = (Cell*) malloc(sizeof(Cell));
-    cl->row = row;
-    cl->col = col;
+Cell Cell_create(int row, int col) {
+    Cell cl;
+    cl.row = row;
+    cl.col = col;
     return cl;
 }
+
 
 int randrange(int a, int b) {
     return rand() % (b - a + 1) + a;
 }
+
 
 char field2char(enum field fld) {  // get char representation for field
     switch (fld) {
@@ -31,6 +33,7 @@ enum field char2field(char ch) {
         default: return EMPTY; break;
     }
 }
+
 
 enum field check_winner(enum field map[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {  // horizontal lines
@@ -87,7 +90,7 @@ void print_map(enum field map[SIZE][SIZE]) {  // pretty print for map
     }
 }
 
-Cell* ai_rand_turn(enum field map[SIZE][SIZE]) {
+Cell ai_rand_turn(enum field map[SIZE][SIZE]) {
     enum bool flag = FALSE;
     int cell_num, rw, cl;
     do {
@@ -96,17 +99,19 @@ Cell* ai_rand_turn(enum field map[SIZE][SIZE]) {
         cl = cell_num % SIZE;
         flag = (map[rw][cl] == EMPTY);
     } while (!flag);
-    return create_cell(rw, cl);
+    return Cell_create(rw, cl);
 }
 
-int check_input(enum field map[SIZE][SIZE], int row, int col) {
-    if (row > SIZE - 1 || row < 0 || col > SIZE - 1 || col < 0) {
+InputCode check_input(enum field map[SIZE][SIZE], Cell turn) {
+    if (turn.row > SIZE - 1 || turn.row < 0 ||
+        turn.col > SIZE - 1 || turn.col < 0)
+    {
         return NOTONMAP;
     }
-    if (map[row][col] != EMPTY) {  // check if cell already taken
+    if (map[turn.row][turn.col] != EMPTY) {  // check if cell already taken
         return NOTEMPTY;
     } else {
-        return OK;
+        return INPUT_OK;
     }
 }
 

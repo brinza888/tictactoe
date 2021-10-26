@@ -15,38 +15,36 @@ void setMode(int value) {
     depthMode = value;
 }
 
-
-struct cell new_cell(int row, int col) {
-    struct cell new;
-    new.row = row;
-    new.col = col;
-    return new;
-}
-
-
-int get_moves(enum field map[SIZE][SIZE], struct cell **moves) {
+int getMoves(enum field map[SIZE][SIZE], Cell** moves, size_t* n) {
+    if (*n < 1 || *moves == NULL) {
+        *n = sizeof(Cell);
+        *moves = (Cell*) malloc(*n);
+    }
     int count = 0;
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            if (map[i][j] == EMPTY) {
-                count += 1;
-                if (sizeof(**moves) < count * sizeof(struct cell)) {
-                    *moves = (struct cell*) realloc(*moves, sizeof(struct cell) * count);
-                    if (moves == NULL) {
-                        printf("Cant realoc moves!\n");
-                        exit(1);
-                    }
+            if (map[i][j] != EMPTY) {
+                continue;
+            }
+            count++;
+            if (*n < count * sizeof(Cell)) {
+                *n += sizeof(Cell);
+                *moves = (Cell*) realloc(*moves, *n);
+                if (!moves) {
+                    fprintf(stderr, "Not enough memory!\n");
+                    exit(1);
                 }
-                (*moves)[count - 1] = new_cell(i, j);
-            }         
+            }
+            (*moves)[count - 1] = Cell_create(i, j);
         }
     }
     return count;
 }
 
-int minimax(enum field (*map)[SIZE][SIZE], int* row, int* col, enum field player, int depth) {
-    *row = -1;
-    *col = -1;
+
+int minimax(enum field (*map)[SIZE][SIZE], Cell* turn, enum field player, int depth) {
+    turn->row = -1;
+    turn->col = -1;
     
     enum field winner = check_winner(*map);
     if (winner != EMPTY) {
@@ -55,47 +53,38 @@ int minimax(enum field (*map)[SIZE][SIZE], int* row, int* col, enum field player
     if (is_draw(*map) || (depthMode != 0 && depth > depthMode)) {
         return 0;
     }
+    
+    Cell* moves;
+    int count = 0;
+    size_t allocated = 0;
+    count = getMoves(*map, &moves, &allocated);
 
-    struct cell* moves = (struct cell*) malloc(sizeof(struct cell) * 1);
-    if (moves == NULL) {
-        printf("Cant malloc moves!\n");
-        exit(1);
-    }
-
-    int count = get_moves(*map, &moves);
-    struct cell ch_move = moves[0];  // choosen move
+    Cell* ch_move;
     int mnmx = (player == ZERO) ? -20 : 20;  // optimized value
     int res = 0;  // last minimax value
     int rw, cl;  // make move
-    int r, c;  // next turn move
     
     for (int i = 0; i < count; i++) {
         rw = moves[i].row;
         cl = moves[i].col;
+
         (*map)[rw][cl] = player;
 
-        res = minimax(map, &r, &c, switch_player(player), depth + 1);
+        res = minimax(map, turn, switch_player(player), depth + 1);
 
-        if (player == ZERO) {
-            if (res > mnmx) {
-                mnmx = res;
-                ch_move = new_cell(rw, cl);
-            }
-        } else if (player == CROSS) {
-            if (res < mnmx) { 
-                mnmx = res;
-                ch_move = new_cell(rw, cl);
-            }
+        if ((player == ZERO && res > mnmx) || (player == CROSS && res < mnmx)) {
+            mnmx = res;
+            ch_move = moves + i;
         }
         
         (*map)[rw][cl] = EMPTY;
     }
-    
-    free(moves);
 
-    *row = ch_move.row;
-    *col = ch_move.col;
-     
+    turn->row = ch_move->row;
+    turn->col = ch_move->col;
+    
+    free(moves);    
+
     return mnmx;
 }
 

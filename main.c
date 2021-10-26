@@ -47,7 +47,7 @@ int main(int argc, char** argv){
     
     int turns_count = 1;
 
-    int row, column; // inputed cell
+    Cell turn = Cell_create(-1, -1); // turn cell
     int ipt_r;  // result of cell input
 
     enum field winner = EMPTY;
@@ -63,22 +63,23 @@ int main(int argc, char** argv){
         printf("\n");
  
         if (current == CROSS) {  // Human turn
-            ipt_r = OK;
+            ipt_r = INPUT_OK;
             do {
                 switch (ipt_r) {
                     case NOTONMAP: printf("Not on map!\n"); break;
                     case NOTEMPTY: printf("Already taken!\n"); break;
                 }
                 printf("Choose row and column to make turn:\n");
-                scanf("%d %d", &row, &column);
-            } while ((ipt_r = check_input(map, --row, --column)) != OK);
+                scanf("%d %d", &turn.row, &turn.col);
+                turn.row--;
+                turn.col--;
+            } while ((ipt_r = check_input(map, turn)) != INPUT_OK);
         }
-        if (current == ZERO) {  // AI turn 
-            int val = minimax(&map, &row, &column, current, 0);
-            printf("Better %d turn: (%d, %d)\n", val, row+1, column+1);
+        else if (current == ZERO) {  // AI turn
+            minimax(&map, &turn, current, 0);
         }
-
-        map[row][column] = current;  // fill cell with player's symbol        
+        
+        map[turn.row][turn.col] = current;  // fill cell with player's symbol        
         
         winner = check_winner(map);  // check winner
         
