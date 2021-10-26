@@ -1,43 +1,50 @@
 #ifndef TICTACTOE
 #define TICTACTOE
 
+#include <stdbool.h>
+
 // size of game map
 #define SIZE 3  // cant be changed!
 
-// error codes for input_cell
-#define OK 0
-#define NOTONMAP 1
-#define NOTEMPTY 2
+// error codes for check_input
+typedef enum InputCode {
+    INPUT_OK,
+    NOTONMAP,
+    NOTEMPTY
+} InputCode;
 
-// boolean values
-enum bool {
-    FALSE,
-    TRUE
-};
 
 // cell type or player type
-enum field {
+typedef enum field {
     EMPTY,
     CROSS,
     ZERO
-};
+} FieldT;
 
-// service functions
-int randrange(int a, int b);
+// cell structure
+typedef struct {
+    int row;
+    int col;
+} Cell;
 
-char field2char(enum field fld);
-enum field char2field(char ch);
 
-enum field switch_player(enum field current);
+// Cell functions
+Cell Cell_create(int row, int col);
 
-void print_map(enum field map[SIZE][SIZE]);
+// FieldT functions
+char field2char(FieldT fld);
+FieldT char2field(char ch);
+FieldT switch_player(FieldT current);
 
-// checks functions
-enum field check_winner(enum field map[SIZE][SIZE]);
-enum bool is_draw(enum field map[SIZE][SIZE]);
+// map functions
+void print_map(FieldT map[SIZE][SIZE]);
 
-// turns functions
-void ai_rand_turn(enum field map[SIZE][SIZE], int* row, int* col);
-int check_input(enum field map[SIZE][SIZE], int row, int col);
+// check functions
+FieldT check_winner(FieldT map[SIZE][SIZE]);
+bool is_draw(FieldT map[SIZE][SIZE]);
+
+// check posibility of turn
+InputCode check_input(FieldT map[SIZE][SIZE], Cell turn);
 
 #endif
+

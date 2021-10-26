@@ -1,4 +1,4 @@
-binaries/
+bin/
 tictactoe
 *.o
 *.vim

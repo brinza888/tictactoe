@@ -1,17 +1,22 @@
-all: tictactoe
+all: outdir tictactoe
 
-tictactoe: main.o tictactoe.o minimax.o
-	gcc -o tictactoe main.o tictactoe.o minimax.o
+tictactoe: bin/main.o bin/tictactoe.o bin/ai.o
+	gcc -o tictactoe bin/main.o bin/tictactoe.o bin/ai.o
 
-main.o: main.c
-	gcc -c main.c
+bin/main.o: main.c
+	gcc -c main.c -o bin/main.o
 
-tictactoe.o: tictactoe.c
-	gcc -c tictactoe.c
+bin/tictactoe.o: tictactoe.c
+	gcc -c tictactoe.c -o bin/tictactoe.o
 
-minimax.o: minimax.c
-	gcc -c minimax.c
+bin/ai.o: ai.c
+	gcc -c ai.c -o bin/ai.o
 
 clean:
-	rm -rf *.o tictactoe
+	rm -rf bin tictactoe
+
+outdir: bin
+
+bin:
+	mkdir -p bin
 

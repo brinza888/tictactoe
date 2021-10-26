@@ -1,18 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "tictactoe.h"
-#include "minimax.h"
+#include "ai.h"
 
-
-const char loadingS[] = {'-', '\\', '|', '/'};
-
-void print_turn(enum field map[SIZE][SIZE], int turn, char ch) {
-    printf("===== %d TURN (%c) =====\n\n", turn, ch);
-    print_map(map);
-    printf("\n");
-}
 
 int main(int argc, char** argv){
     enum field map[SIZE][SIZE];
@@ -28,7 +21,7 @@ int main(int argc, char** argv){
     char current_ch;  // current player char
     printf("Who is the first? [X/O]: ");
     scanf("%c", &current_ch);
-    enum field current = char2field(current_ch);
+    FieldT current = char2field(current_ch);
 
     char ai_mode_ch;
     int ai_mode;
@@ -55,38 +48,41 @@ int main(int argc, char** argv){
     
     int turns_count = 1;
 
-    int row, column; // inputed cell
+    Cell turn = Cell_create(-1, -1); // turn cell
     int ipt_r;  // result of cell input
 
-    enum field winner = EMPTY;
-    enum bool is_running = TRUE;
+    FieldT winner = EMPTY;
+    bool is_running = true;
 
     while (is_running) {
         system("clear");  // clear last output
 
         current_ch = field2char(current);  // get char representation of player
         
-        print_turn(map, turns_count, current_ch);  // print map and turn header
+        printf("===== %d TURN (%c) =====\n\n", turns_count, current_ch);
+        print_map(map);
+        printf("\n");
  
         if (current == CROSS) {  // Human turn
-            ipt_r = OK;
+            ipt_r = INPUT_OK;
             do {
                 switch (ipt_r) {
                     case NOTONMAP: printf("Not on map!\n"); break;
                     case NOTEMPTY: printf("Already taken!\n"); break;
                 }
                 printf("Choose row and column to make turn:\n");
-                scanf("%d %d", &row, &column);
-            } while ((ipt_r = check_input(map, --row, --column)) != OK);
+                scanf("%d %d", &turn.row, &turn.col);
+                turn.row--;
+                turn.col--;
+            } while ((ipt_r = check_input(map, turn)) != INPUT_OK);
         }
-        if (current == ZERO) {  // AI turn 
-            int val = minimax(&map, &row, &column, current, 0);
-            printf("Better %d turn: (%d, %d)\n", val, row+1, column+1);
+        else if (current == ZERO) {  // AI turn
+            ai_minimax(&map, &turn, current, 0);
+            // ai_random(&map, &turn);
         }
-
-        map[row][column] = current;  // fill cell with player's symbol        
         
-        print_map(map);
+        map[turn.row][turn.col] = current;  // fill cell with player's symbol        
+        
         winner = check_winner(map);  // check winner
         
         if (winner != EMPTY) {  // if winner exists

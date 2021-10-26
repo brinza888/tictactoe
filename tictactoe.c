@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "tictactoe.h"
 
 
-int randrange(int a, int b) {
-    return rand() % (b - a + 1) + a;
+Cell Cell_create(int row, int col) {
+    Cell cl;
+    cl.row = row;
+    cl.col = col;
+    return cl;
 }
 
-char field2char(enum field fld) {  // get char representation for field
+
+char field2char(FieldT fld) {  // get char representation for field
     switch (fld) {
         case CROSS: return 'X'; break;
         case ZERO: return 'O'; break;
@@ -17,7 +22,8 @@ char field2char(enum field fld) {  // get char representation for field
     }
 }
 
-enum field char2field(char ch) {
+
+FieldT char2field(char ch) {
     switch (ch) {
         case 'X': return CROSS; break;
         case 'O': return ZERO; break;
@@ -25,7 +31,8 @@ enum field char2field(char ch) {
     }
 }
 
-enum field check_winner(enum field map[SIZE][SIZE]) {
+
+FieldT check_winner(FieldT map[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {  // horizontal lines
         if (map[i][0] == map[i][1] && map[i][1] == map[i][2] && map[i][1] != EMPTY) {
             return map[i][1];
@@ -46,18 +53,20 @@ enum field check_winner(enum field map[SIZE][SIZE]) {
     return EMPTY;  // winner not found
 }
 
-enum bool is_draw(enum field map[SIZE][SIZE]) {
+
+bool is_draw(FieldT map[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             if (map[i][j] == EMPTY) {
-                return FALSE;
+                return false;
             }
         }
     }
-    return TRUE;
+    return true;
 }   
 
-void print_map(enum field map[SIZE][SIZE]) {  // pretty print for map
+
+void print_map(FieldT map[SIZE][SIZE]) {  // pretty print for map
     printf("  ");
     for (int i = 0; i < SIZE; i++) {  // columns indices
         printf(" %d", i + 1);
@@ -80,30 +89,22 @@ void print_map(enum field map[SIZE][SIZE]) {  // pretty print for map
     }
 }
 
-void ai_rand_turn(enum field map[SIZE][SIZE], int* row, int* col) {
-    enum bool flag = FALSE;
-    int cell_num, rw, cl;
-    do {
-        cell_num = randrange(0, SIZE*SIZE - 1);
-        rw = cell_num / SIZE;
-        cl = cell_num % SIZE;
-        flag = (map[rw][cl] == EMPTY);
-    } while (!flag);
-    *row = rw;
-    *col = cl;
-}
 
-int check_input(enum field map[SIZE][SIZE], int row, int col) {
-    if (row > SIZE - 1 || row < 0 || col > SIZE - 1 || col < 0) {
+InputCode check_input(FieldT map[SIZE][SIZE], Cell turn) {
+    if (turn.row > SIZE - 1 || turn.row < 0 ||
+        turn.col > SIZE - 1 || turn.col < 0)
+    {
         return NOTONMAP;
     }
-    if (map[row][col] != EMPTY) {  // check if cell already taken
+    if (map[turn.row][turn.col] != EMPTY) {  // check if cell already taken
         return NOTEMPTY;
     } else {
-        return OK;
+        return INPUT_OK;
     }
 }
 
-enum field switch_player(enum field current) {
+
+FieldT switch_player(FieldT current) {
     return (current == CROSS) ? ZERO : CROSS;
 }
+
