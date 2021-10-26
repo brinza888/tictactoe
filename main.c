@@ -77,7 +77,8 @@ int main(int argc, char** argv){
             } while ((ipt_r = check_input(map, turn)) != INPUT_OK);
         }
         else if (current == ZERO) {  // AI turn
-            minimax(&map, &turn, current, 0);
+            ai_minimax(&map, &turn, current, 0);
+            // ai_random(&map, &turn);
         }
         
         map[turn.row][turn.col] = current;  // fill cell with player's symbol        

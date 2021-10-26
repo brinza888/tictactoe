@@ -14,11 +14,6 @@ Cell Cell_create(int row, int col) {
 }
 
 
-int randrange(int a, int b) {
-    return rand() % (b - a + 1) + a;
-}
-
-
 char field2char(FieldT fld) {  // get char representation for field
     switch (fld) {
         case CROSS: return 'X'; break;
@@ -26,6 +21,7 @@ char field2char(FieldT fld) {  // get char representation for field
         default: return ' '; break;
     }
 }
+
 
 FieldT char2field(char ch) {
     switch (ch) {
@@ -57,6 +53,7 @@ FieldT check_winner(FieldT map[SIZE][SIZE]) {
     return EMPTY;  // winner not found
 }
 
+
 bool is_draw(FieldT map[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -67,6 +64,7 @@ bool is_draw(FieldT map[SIZE][SIZE]) {
     }
     return true;
 }   
+
 
 void print_map(FieldT map[SIZE][SIZE]) {  // pretty print for map
     printf("  ");
@@ -91,17 +89,6 @@ void print_map(FieldT map[SIZE][SIZE]) {  // pretty print for map
     }
 }
 
-Cell ai_rand_turn(FieldT map[SIZE][SIZE]) {
-    bool flag = false;
-    int cell_num, rw, cl;
-    do {
-        cell_num = randrange(0, SIZE*SIZE - 1);
-        rw = cell_num / SIZE;
-        cl = cell_num % SIZE;
-        flag = (map[rw][cl] == EMPTY);
-    } while (!flag);
-    return Cell_create(rw, cl);
-}
 
 InputCode check_input(FieldT map[SIZE][SIZE], Cell turn) {
     if (turn.row > SIZE - 1 || turn.row < 0 ||
@@ -116,6 +103,8 @@ InputCode check_input(FieldT map[SIZE][SIZE], Cell turn) {
     }
 }
 
+
 FieldT switch_player(FieldT current) {
     return (current == CROSS) ? ZERO : CROSS;
 }
+

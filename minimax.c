@@ -7,6 +7,12 @@
 
 static int depthMode = MODE_EXPERT;
 
+
+int randrange(int a, int b) {
+    return rand() % (b - a + 1) + a;
+}
+
+
 int getMode() {
     return depthMode;
 }
@@ -14,6 +20,7 @@ int getMode() {
 void setMode(int value) {
     depthMode = value;
 }
+
 
 int getMoves(FieldT (*map)[SIZE][SIZE], Cell** moves, size_t* n) {
     if (*n < 1 || *moves == NULL) {
@@ -42,7 +49,7 @@ int getMoves(FieldT (*map)[SIZE][SIZE], Cell** moves, size_t* n) {
 }
 
 
-int minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth) {
+int ai_minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth) {
     turn->row = -1;
     turn->col = -1;
     
@@ -70,7 +77,7 @@ int minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth) {
 
         (*map)[rw][cl] = player;
 
-        res = minimax(map, turn, switch_player(player), depth + 1);
+        res = ai_minimax(map, turn, switch_player(player), depth + 1);
 
         if ((player == ZERO && res > mnmx) || (player == CROSS && res < mnmx)) {
             mnmx = res;
@@ -86,5 +93,15 @@ int minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth) {
     free(moves);    
 
     return mnmx;
+}
+
+
+void ai_random(FieldT (*map)[SIZE][SIZE], Cell* turn) {
+    Cell* moves;
+    size_t allocated = 0;
+    int count = 0;
+    count = getMoves(map, &moves, &allocated);
+    int r_i = randrange(0, count - 1);
+    *turn = moves[r_i];
 }
 
