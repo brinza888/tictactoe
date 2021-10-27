@@ -1,0 +1,22 @@
+all: out_dir tgui
+
+tgui: bin/ai.o bin/tictactoe.o bin/tgui.o
+	gcc -o tgui bin/ai.o bin/tictactoe.o bin/tgui.o -lncurses
+
+bin/ai.o: ai.c
+	gcc -c ai.c -o bin/ai.o
+
+bin/tictactoe.o: tictactoe.c
+	gcc -c tictactoe.c -o bin/tictactoe.o
+
+bin/tgui.o: tgui.c
+	gcc -c tgui.c -o bin/tgui.o
+
+clean:
+	rm -rf bin tgui
+
+out_dir: bin
+
+bin:
+	mkdir -p bin
+
