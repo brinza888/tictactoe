@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "tictactoe.h"
 
-#define CELL_SIZE 3
+#define CELL_SIZE 5
 
 
 const int sideSize;

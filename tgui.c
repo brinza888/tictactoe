@@ -11,19 +11,29 @@
 const int sideSize = SIZE * (CELL_SIZE + 1) + 1;
 
 
-Symbol SCROSS = {{'X', ' ', 'X'},
-                 {' ', 'X', ' '},
-                 {'X', ' ', 'X'}};
 
-Symbol SZERO = {{'O', 'O', 'O'},
-                {'O', ' ', 'O'},
-                {'O', 'O', 'O'}};
+Symbol SCROSS = {' ', ' ', ' ', ' ', ' ',
+                 ' ', 'X', ' ', 'X', ' ',
+                 ' ', ' ', 'X', ' ', ' ',
+                 ' ', 'X', ' ', 'X', ' ',
+                 ' ', ' ', ' ', ' ', ' '};
 
-Symbol SSEL = {{'?', ' ', '?'},
-               {' ', '?', ' '},
-               {'?', ' ', '?'}};
+Symbol SZERO = {' ', ' ', ' ', ' ', ' ',
+                ' ', 'O', 'O', 'O', ' ',
+                ' ', 'O', ' ', 'O', ' ',
+                ' ', 'O', 'O', 'O', ' ',
+                ' ', ' ', ' ', ' ', ' '};
 
-Symbol SEMPTY = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
+Symbol SSEL = {'X', ' ', '\0', ' ', 'X',
+               ' ', '\0', '\0', '\0', ' ',
+               ' ', '\0', '\0', '\0', '\0',
+               ' ', '\0', '\0', '\0', ' ',
+               'X', ' ', '\0', ' ', 'X'};
+
+
+Symbol SEMPTY = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+                 ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+                 ' ', ' ', ' ', ' ', ' '};
 
 
 
@@ -130,6 +140,9 @@ void placeSymbol(WINDOW* mapWin, Cell* position, Symbol* symb) {
     convertPosition(position, &wy, &wx);
     for (int i = 0; i < CELL_SIZE; i++) {
         for (int j = 0; j < CELL_SIZE; j++) {
+            if ((*symb)[i][j] == '\0') {
+                continue;
+            }
             mvwaddch(mapWin, wy + i, wx + j, (*symb)[i][j]);
         }
     }
