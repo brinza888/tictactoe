@@ -1,26 +1,19 @@
-.PHONY: all clean run run_tgui outdir
+.PHONY: all clean run outdir
 
-all: ttt_console ttt_tgui
+OUTFILE = ttt
 
+all: $(OUTFILE)
 
 clean:
-	rm -rf bin ttt_tgui ttt_console
+	rm -rf bin $(OUTFILE)
 
-run: ttt_console
-	./ttt_console
+run: $(OUTFILE)
+	./$(OUTFILE)
 
-run_tgui: ttt_tgui
-	./ttt_tgui
+ttt: bin/main.o bin/tictactoe.o bin/ai.o bin/tgui.o
+	gcc bin/main.o bin/tictactoe.o bin/ai.o bin/tgui.o -lncurses -o $(OUTFILE)
 
-
-ttt_console: bin/main.o bin/tictactoe.o bin/ai.o
-	gcc -o ttt_console bin/main.o bin/tictactoe.o bin/ai.o
-
-ttt_tgui: bin/tgui.o bin/tictactoe.o bin/ai.o
-	gcc -o ttt_tgui bin/tgui.o bin/tictactoe.o bin/ai.o -lncurses
-
-
-bin/main.o: main.c
+bin/main.o: main.c outdir
 	gcc -c main.c -o bin/main.o
 
 bin/tictactoe.o: tictactoe.c

@@ -4,4 +4,5 @@ tictactoe
 *.vim
 ttt_console
 ttt_tgui
+ttt
 
