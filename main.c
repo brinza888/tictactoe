@@ -133,6 +133,8 @@ int main(int argc, char** argv) {
         currentPlayer = switch_player(currentPlayer);
     }
     
+    mvprintw(0, 0, "To exit press F2 or q buttons!");
+     
     while ((ch = getch()) != KEY_F(2) && ch != 'q') {  // just wait for exit key
         ;
     }
