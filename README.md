@@ -1,8 +1,20 @@
 # TicTacToe written in C
-TicTacToe game with AI written in C (console interface)
+TicTacToe game with AI written in C (terminal interactive interface).
 
-## Installation and run
-1. Clone repo:
+**Only Linux** is supported as target platform.
+
+## Simplest way to start game
+1. Download latest release in Releases section on GitHub.
+2. Run binary file (tictactoe.exe or tictactoe). For Linux use following command:
+  ```
+  ./tictactoe
+  ```
+
+## Start game from project sources
+Skip this if you have successfully run game in previous step.
+
+### Getting sources
+1. Clone repo (or you can download latest release sources):
 ```
 git clone https://github.com/BrinzaBezrukoff/tictactoe.git
 ```
@@ -10,30 +22,24 @@ git clone https://github.com/BrinzaBezrukoff/tictactoe.git
 ```
 cd tictactoe
 ```
-3. Compile source with make:
-  ```
-  make
-  ```
-  or with gcc:
-  ```
-  gcc main.c tictactoe.c minimax.c -o tictactoe
-  ```
-4. Run binary:
+
+### One-command build and run
+**You need to have ncurses library installed!**
 ```
-./tictactoe
+make run
 ```
+
+
 ## Play
+AI is playing as zero, human is playing as cross and always starts.
 
+1. Choose level mode for AI **using arrow buttons** (this feature in develoment, modes are not balanced).
 
-1. Choose who will be make turn first. Type X or O and press Enter key.
-  ![image](https://user-images.githubusercontent.com/29017599/138512021-00aa33b2-c18c-4c30-8938-d2b4b989de8e.png)
-  * Human playing for X
-  * AI playing for O
-2. Choose level mode for AI (this feature in develoment, some modes work incorrect):
-  ![image](https://user-images.githubusercontent.com/29017599/138511830-b7aa34fc-f540-44e7-8246-3402b464d4f4.png)
-  * Easy (E)
-  * Medium (M)
-  * Hard (H)
-  * eXpert (X)
-3. When it is your time to make turn, type 2 numbers: row and column indices of cell, where you want to place X.
-  ![image](https://user-images.githubusercontent.com/29017599/138511117-e12dba88-b23c-44d6-87a8-3afce50d9b97.png)
+  ![image](https://user-images.githubusercontent.com/29017599/145648147-60493a5a-9297-4e91-ace0-eb3952e61be4.png)
+
+2. When it is your time to make turn, **use arrow buttons** to navigate on map. Selection is marked with yellow crosses. Press enter to place Cross in selected cell.
+
+  ![image](https://user-images.githubusercontent.com/29017599/145648244-b8f91880-a3f5-43aa-b557-976020f0186a.png)
+  
+  ![image](https://user-images.githubusercontent.com/29017599/145648543-74bd5d3f-54bd-48d5-829e-c30a338879bf.png)
+
