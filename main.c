@@ -1,117 +1,190 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <stdbool.h>
+
+#include <ncurses.h>
 
 #include "tictactoe.h"
 #include "ai.h"
+#include "tgui.h"
 
 
-int main(int argc, char** argv){
-    enum field map[SIZE][SIZE];
+InputCode chooseCell(WINDOW* mapWin, FieldT (*map)[SIZE][SIZE], Cell* selection);
+
+char* winnerNames[] = {"Empty", "Cross", "Zero"};
+
+
+int main(int argc, char** argv) {
+    initscr();
+    raw();
+    noecho();
+    keypad(stdscr, true);
+    curs_set(false);
+    start_color();
+
+    init_pair(1, COLOR_RED, COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_BLUE, COLOR_BLACK);
+    init_pair(4, COLOR_YELLOW, COLOR_BLACK);
     
-    srand(time(NULL));
+    int scr_h, scr_w;
+    int ch = 0;
     
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            map[i][j] = EMPTY;  // fill map with empty cells
+    getmaxyx(stdscr, scr_h, scr_w);
+    refresh();
+    
+    int menu_h = 20;
+    int menu_w = 40;
+    
+    WINDOW* menu_win = getMenuWin(3, 5, menu_h, menu_w);
+    MenuOption menu_list[] = {
+        getMenuOption(MODE_EASY, "Easy"),
+        getMenuOption(MODE_MEDIUM, "Medium"),
+        getMenuOption(MODE_HARD, "Hard"),
+        getMenuOption(MODE_EXPERT, "Expert")
+    };
+    bool menuActive = true;
+    int menuL = sizeof(menu_list) / sizeof(MenuOption);
+    int menuSel = 0;
+    
+    // choose ai mode loop
+    do {
+        wclear(menu_win);
+        mvwprintw(menu_win, 1, menu_w / 2 - 7, "Choose AI mode");
+        
+        switch (ch) {
+            case KEY_UP: menuSel--; break;
+            case KEY_DOWN: menuSel++; break;
+            case '\n':
+                menuActive = false;
+                break;
         }
+        menuSel = (menuSel + menuL) % menuL;  // hold selection in options range
+        
+        box(menu_win, 0, 0); 
+        drawMenu(menu_win, menu_list, menuL, menuSel);
+        wrefresh(menu_win);
+    } while (menuActive && (ch = getch()) != KEY_F(2) && ch != 'q');
+    
+    if (ch == KEY_F(2) || ch == 'q') {  // if player pressed F2 or q - exit
+        endwin();
+        exit(0);
     }
 
-    char current_ch;  // current player char
-    printf("Who is the first? [X/O]: ");
-    scanf("%c", &current_ch);
-    FieldT current = char2field(current_ch);
-
-    char ai_mode_ch;
-    int ai_mode;
-    printf("AI mode?\n");
-    printf("Easy Medium Hard Expert [E/M/H/X]: ");
-    scanf("%*c%c", &ai_mode_ch);
-    switch (ai_mode_ch) {
-        case 'E': ai_mode = MODE_EASY; break;
-        case 'M': ai_mode = MODE_MEDIUM; break;
-        case 'H': ai_mode = MODE_HARD; break;
-        case 'X': ai_mode = MODE_EXPERT; break;
-        default:
-            printf("Incorrect mode specified!\n");
-            return 1;
-            break;
-    }
-
+    int ai_mode = menu_list[menuSel].code;
     setMode(ai_mode);
     
-    if (current == EMPTY) {
-        printf("You may choose only X or O\n");
-        return 1;
+    clear();
+    refresh();
+
+    // internal map
+    FieldT map[SIZE][SIZE];
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            map[i][j] = EMPTY;
+        }
     }
     
-    int turns_count = 1;
+    // map window
+    WINDOW* map_win = getMapWin(3, 5);
 
-    Cell turn = Cell_create(-1, -1); // turn cell
-    int ipt_r;  // result of cell input
-
+    FieldT currentPlayer = CROSS;
     FieldT winner = EMPTY;
-    bool is_running = true;
 
-    while (is_running) {
-        system("clear");  // clear last output
-
-        current_ch = field2char(current);  // get char representation of player
-        
-        printf("===== %d TURN (%c) =====\n\n", turns_count, current_ch);
-        print_map(map);
-        printf("\n");
- 
-        if (current == CROSS) {  // Human turn
-            ipt_r = INPUT_OK;
-            do {
-                switch (ipt_r) {
-                    case NOTONMAP: printf("Not on map!\n"); break;
-                    case NOTEMPTY: printf("Already taken!\n"); break;
-                }
-                printf("Choose row and column to make turn:\n");
-                scanf("%d %d", &turn.row, &turn.col);
-                turn.row--;
-                turn.col--;
-            } while ((ipt_r = check_input(map, turn)) != INPUT_OK);
+    Cell turn;
+    
+    InputCode inputStatus;
+    
+    // game loop
+    while (1) {
+         
+        if (currentPlayer == CROSS) {
+            inputStatus = chooseCell(map_win, &map, &turn);
+            if (inputStatus == NOTONMAP) {  // if player pressed F2 or q - exit
+                endwin();
+                exit(0);
+            }
         }
-        else if (current == ZERO) {  // AI turn
-            ai_minimax(&map, &turn, current, 0);
-            // ai_random(&map, &turn);
+        else {
+            ai_minimax(&map, &turn, currentPlayer, 0);
         }
         
-        map[turn.row][turn.col] = current;  // fill cell with player's symbol        
+        map[turn.row][turn.col] = currentPlayer;
         
-        winner = check_winner(map);  // check winner
-        
-        if (winner != EMPTY) {  // if winner exists
-            system("clear");
-            printf("===== WIN =====\n\n");
-            
-            print_map(map);
-            printf("\n");
+        // draw situation on map
+        drawMap(map_win, 0, 0);
+        drawSymbols(map_win, &map);
+        wrefresh(map_win);
 
-            printf("%c is winner here! \n", current_ch);
-            printf("%d moves was enough for him!\n\n", turns_count);
+        winner = check_winner(map);  // if win
+        if (winner != EMPTY) {
+            attron(COLOR_PAIR((winner == CROSS) ? 2 : 3));
+            mvprintw(2, 5, "%s is winner here!", winnerNames[winner]);
+            attroff(COLOR_PAIR((winner == CROSS) ? 2 : 3));
+            refresh();
             break;
         }
-        if (is_draw(map)) {  // check if draw
-            system("clear");
-            printf("===== DRAW =====\n\n");
-            
-            print_map(map);
-            printf("\n");
-            
-            printf("There are no empty cells left after %d turns!\n", turns_count);
-            printf("This is a draw! Winners all around =)\n\n");
+        if (is_draw(map)) {  // if draw
+            mvprintw(2, 5, "It is draw!");
+            refresh();
             break;
         }
 
-        turns_count++;  // turns counting
-        current = switch_player(current);  // player switching
+        currentPlayer = switch_player(currentPlayer);
     }
     
-	return 0;
+    mvprintw(0, 0, "To exit press F2 or q buttons!");
+     
+    while ((ch = getch()) != KEY_F(2) && ch != 'q') {  // just wait for exit key
+        ;
+    }
+    
+    endwin();
+    return 0;
+}
+
+
+InputCode chooseCell(WINDOW* mapWin, FieldT (*map)[SIZE][SIZE], Cell* selection) {
+    int ch;
+    InputCode inputStatus = NOTONMAP;
+    selection->row = 0;
+    selection->col = 0;
+    do {
+        inputStatus = NOTONMAP;
+        switch (ch) {
+            case KEY_UP: selection->row--; break;
+            case KEY_DOWN: selection->row++; break;
+            case KEY_LEFT: selection->col--; break;
+            case KEY_RIGHT: selection->col++; break;
+            case '\n':
+                inputStatus = check_input(*map, *selection);
+                break;
+        }
+        if (inputStatus == INPUT_OK) {
+            break;
+        }
+        else if (inputStatus == NOTEMPTY) {
+            attron(COLOR_PAIR(1));
+            mvprintw(2, 5, "Cell not empty!");
+            refresh();
+            attroff(COLOR_PAIR(1));
+        }
+        else {
+            clear();
+            refresh();
+        }
+        
+        selection->col = (selection->col + SIZE) % SIZE;  // hold selection in cells range
+        selection->row = (selection->row + SIZE) % SIZE;
+        
+        drawMap(mapWin, 0, 0);
+        drawSymbols(mapWin, map);
+        wattron(mapWin, COLOR_PAIR(4));
+        placeSymbol(mapWin, selection, &SSEL);
+        wattroff(mapWin, COLOR_PAIR(4));
+        wrefresh(mapWin);
+    } while ((ch = getch()) != KEY_F(2) && ch != 'q');
+
+    return inputStatus;
 }
 

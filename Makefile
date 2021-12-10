@@ -1,9 +1,19 @@
-all: outdir tictactoe
+.PHONY: all clean run outdir
 
-tictactoe: bin/main.o bin/tictactoe.o bin/ai.o
-	gcc -o tictactoe bin/main.o bin/tictactoe.o bin/ai.o
+OUTFILE = ttt
 
-bin/main.o: main.c
+all: $(OUTFILE)
+
+clean:
+	rm -rf bin $(OUTFILE)
+
+run: $(OUTFILE)
+	./$(OUTFILE)
+
+ttt: bin/main.o bin/tictactoe.o bin/ai.o bin/tgui.o
+	gcc bin/main.o bin/tictactoe.o bin/ai.o bin/tgui.o -lncurses -o $(OUTFILE)
+
+bin/main.o: main.c outdir
 	gcc -c main.c -o bin/main.o
 
 bin/tictactoe.o: tictactoe.c
@@ -12,8 +22,9 @@ bin/tictactoe.o: tictactoe.c
 bin/ai.o: ai.c
 	gcc -c ai.c -o bin/ai.o
 
-clean:
-	rm -rf bin tictactoe
+bin/tgui.o: tgui.c
+	gcc -c tgui.c -o bin/tgui.o
+
 
 outdir: bin
 
