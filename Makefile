@@ -10,6 +10,9 @@ clean:
 run: $(OUTFILE)
 	./$(OUTFILE)
 
+runsep: $(OUTFILE)
+	gnome-terminal -- ./ttt
+
 ttt: bin/main.o bin/tictactoe.o bin/ai.o bin/tgui.o
 	gcc bin/main.o bin/tictactoe.o bin/ai.o bin/tgui.o -lncurses -o $(OUTFILE)
 
