@@ -43,8 +43,8 @@ FieldT check_winner(FieldT map[SIZE][SIZE]) {
             return map[1][i];
         }
     }
-    if (map[0][0] == map[1][1] && map[1][1] == map[2][2] ||
-		map[0][2] == map[1][1] && map[1][1] == map[2][0])  // diagonal check
+    if ((map[0][0] == map[1][1] && map[1][1] == map[2][2]) ||
+		(map[0][2] == map[1][1] && map[1][1] == map[2][0]))  // diagonal check
     {
         if (map[1][1] != EMPTY) {
             return map[1][1];

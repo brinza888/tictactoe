@@ -11,29 +11,33 @@
 const int sideSize = SIZE * (CELL_SIZE + 1) + 1;
 
 
-Symbol SCROSS = {' ', ' ', ' ', ' ', ' ',
-                 ' ', 'X', ' ', 'X', ' ',
-                 ' ', ' ', 'X', ' ', ' ',
-                 ' ', 'X', ' ', 'X', ' ',
-                 ' ', ' ', ' ', ' ', ' '};
+Symbol SCROSS = {
+    {' ', ' ', ' ', ' ', ' '},
+    {' ', 'X', ' ', 'X', ' '},
+    {' ', ' ', 'X', ' ', ' '},
+    {' ', 'X', ' ', 'X', ' '},
+    {' ', ' ', ' ', ' ', ' '}};
 
-Symbol SZERO = {' ', ' ', ' ', ' ', ' ',
-                ' ', 'O', 'O', 'O', ' ',
-                ' ', 'O', ' ', 'O', ' ',
-                ' ', 'O', 'O', 'O', ' ',
-                ' ', ' ', ' ', ' ', ' '};
+Symbol SZERO = {
+    {' ', ' ', ' ', ' ', ' '},
+    {' ', 'O', 'O', 'O', ' '},
+    {' ', 'O', ' ', 'O', ' '},
+    {' ', 'O', 'O', 'O', ' '},
+    {' ', ' ', ' ', ' ', ' '}};
 
-Symbol SSEL = {'X', ' ', '\0', ' ', 'X',
-               ' ', '\0', '\0', '\0', ' ',
-               ' ', '\0', '\0', '\0', '\0',
-               ' ', '\0', '\0', '\0', ' ',
-               'X', ' ', '\0', ' ', 'X'};
+Symbol SSEL = {
+    {'X', ' ', '\0', ' ', 'X'},
+    {' ', '\0', '\0', '\0', ' '},
+    {' ', '\0', '\0', '\0', '\0'},
+    {' ', '\0', '\0', '\0', ' '},
+    {'X', ' ', '\0', ' ', 'X'}};
 
-Symbol SEMPTY = {' ', ' ', ' ', ' ', ' ',
-                 ' ', ' ', ' ', ' ', ' ',
-                 ' ', ' ', ' ', ' ', ' ',
-                 ' ', ' ', ' ', ' ', ' ',
-                 ' ', ' ', ' ', ' ', ' '};
+Symbol SEMPTY = {
+    {' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' '}};
 
 // Menu functions
 
@@ -57,7 +61,7 @@ void drawMenu(WINDOW* menuWin, MenuOption* menuList, int menuLen, int selected) 
         nameL = strlen(mo->name);
         if (i == selected)
             wattron(menuWin, A_REVERSE);
-        mvwprintw(menuWin, y + i, x - nameL / 2, mo->name);
+        mvwprintw(menuWin, y + i, x - nameL / 2, "%s", mo->name);
         if (i == selected)
             wattroff(menuWin, A_REVERSE);
     }
@@ -102,7 +106,7 @@ void drawMap(WINDOW* mapWin, int y, int x) {
                 }
             }
             else if (j % (CELL_SIZE + 1) == 0) {
-                if (i == 0 | i == sideSize - 1) {
+                if ((i == 0) | (i == sideSize - 1)) {
                     mvwaddch(mapWin, y + j, x + i, (i == 0) ? ACS_LTEE : ACS_RTEE);
                 }
                 else if (i % (CELL_SIZE + 1) == 0) {
@@ -113,7 +117,7 @@ void drawMap(WINDOW* mapWin, int y, int x) {
                 }
             }
             else {
-                if (i == 0 || i == sideSize - 1) {
+                if ((i == 0) || (i == sideSize - 1)) {
                     mvwaddch(mapWin, y + j, x + i, ACS_VLINE);
                 }
                 else if (i % (CELL_SIZE + 1) == 0) {

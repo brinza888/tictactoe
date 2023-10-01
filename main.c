@@ -27,10 +27,8 @@ int main(int argc, char** argv) {
     init_pair(3, COLOR_BLUE, COLOR_BLACK);
     init_pair(4, COLOR_YELLOW, COLOR_BLACK);
     
-    int scr_h, scr_w;
     int ch = 0;
     
-    getmaxyx(stdscr, scr_h, scr_w);
     refresh();
     
     int menu_h = 20;
