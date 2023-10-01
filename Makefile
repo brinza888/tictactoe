@@ -1,36 +1,33 @@
-.PHONY: all clean run outdir
+CC = gcc
+CFLAGS = -Wall
 
-OUTFILE = ttt
+BIN = bin/
+EXE = ttt
 
-all: $(OUTFILE)
+SOURCES = tictactoe.c ai.c tgui.c main.c
+OBJECTS = $(addprefix $(BIN), $(SOURCES:.c=.o))
 
+.PHONY: all
+all: $(EXE)
+
+.PHONY: clean
 clean:
-	rm -rf bin $(OUTFILE)
+	rm -rf $(BIN) $(EXE)
 
-run: $(OUTFILE)
-	./$(OUTFILE)
+.PHONY: run
+run: $(EXE)
+	./$(EXE)
 
-runsep: $(OUTFILE)
-	gnome-terminal -- ./ttt
+.PHONY: window
+window: $(EXE)
+	gnome-terminal -- ./$(EXE)
 
-ttt: bin/main.o bin/tictactoe.o bin/ai.o bin/tgui.o
-	gcc bin/main.o bin/tictactoe.o bin/ai.o bin/tgui.o -lncurses -o $(OUTFILE)
+$(EXE): $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -lncurses -o $(EXE)
 
-bin/main.o: main.c outdir
-	gcc -c main.c -o bin/main.o
+$(BIN)%.o: %.c $(BIN)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-bin/tictactoe.o: tictactoe.c
-	gcc -c tictactoe.c -o bin/tictactoe.o
-
-bin/ai.o: ai.c
-	gcc -c ai.c -o bin/ai.o
-
-bin/tgui.o: tgui.c
-	gcc -c tgui.c -o bin/tgui.o
-
-
-outdir: bin
-
-bin:
-	mkdir -p bin
+$(BIN):
+	mkdir -p $(BIN)
 

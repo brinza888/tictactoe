@@ -7,15 +7,15 @@
 #define CELL_SIZE 5
 
 
-const int sideSize;
+extern const int sideSize;
 
 // Symbols
 typedef char Symbol[CELL_SIZE][CELL_SIZE];
 
-Symbol SCROSS;
-Symbol SZERO;
-Symbol SSEL;
-Symbol SEMPTY;
+extern Symbol SCROSS;
+extern Symbol SZERO;
+extern Symbol SSEL;
+extern Symbol SEMPTY;
 
 // For any menus
 typedef struct {
