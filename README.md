@@ -1,36 +1,53 @@
-# TicTacToe written in C
+# TicTacToe game
 TicTacToe game with AI written in C (terminal interactive interface).
 
-**Only Linux** is supported as target platform.
+**Only Linux** is currently supported as target platform.
 
-## Simplest way to start game
+## How to start game
+### Method 1 - Use already compiled executable
 1. Download latest release in Releases section on GitHub.
-2. Run binary file (tictactoe.exe or tictactoe). For Linux use following command:
+2. Extract downloaded archive.
+3. Run executable file:
   ```
-  ./tictactoe
+  ./ttt
   ```
 
-## Start game from project sources
-Skip this if you have successfully run game in previous step.
-
-### Getting sources
-1. Clone repo (or you can download latest release sources):
+### Method 2 - Download sources and build
+1. Install requirements for build
+```
+sudo apt update && sudo apt install -y git make gcc libncurses-dev
+```
+2. Clone repo:
 ```
 git clone https://github.com/BrinzaBezrukoff/tictactoe.git
 ```
-2. Navigate inside repo folder:
+3. Navigate inside repository directory:
 ```
 cd tictactoe
 ```
-
-### One-command build and run
-**You need to have ncurses library installed!**
+4. Build with GNU Make and GCC
+```
+make
+```
+5. Run executable file
+```
+./ttt
+```
+#### Some extra make options
+1. For systems with gnome-terminal installed there is option to run game in separated window:
+```
+make window
+```
+2. Build and run in one line:
 ```
 make run
 ```
+3. Clean everything related to build
+```
+make clean
+```
 
-
-## Play
+## Gameplay
 AI is playing as zero, human is playing as cross and always starts.
 
 1. Choose level mode for AI **using arrow buttons** (this feature in develoment, modes are not balanced).
