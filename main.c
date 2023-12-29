@@ -27,51 +27,26 @@ int main(int argc, char** argv) {
     init_pair(3, COLOR_BLUE, COLOR_BLACK);
     init_pair(4, COLOR_YELLOW, COLOR_BLACK);
     
-    int ch = 0;
-    
     refresh();
     
-    int menu_h = 20;
-    int menu_w = 40;
-    
-    WINDOW* menu_win = getMenuWin(3, 5, menu_h, menu_w);
-    MenuOption menu_list[] = {
-        getMenuOption(MODE_EASY, "Easy"),
-        getMenuOption(MODE_MEDIUM, "Medium"),
-        getMenuOption(MODE_HARD, "Hard"),
-        getMenuOption(MODE_EXPERT, "Expert")
+    MenuOption ai_menu_opt[] = {
+        {MODE_EASY, "Easy"},
+        {MODE_MEDIUM, "Medium"},
+        {MODE_HARD, "Hard"},
+        {MODE_EXPERT, "Expert"}
     };
-    bool menuActive = true;
-    int menuL = sizeof(menu_list) / sizeof(MenuOption);
-    int menuSel = 0;
-    
-    // choose ai mode loop
-    do {
-        wclear(menu_win);
-        mvwprintw(menu_win, 1, menu_w / 2 - 7, "Choose AI mode");
-        
-        switch (ch) {
-            case KEY_UP: menuSel--; break;
-            case KEY_DOWN: menuSel++; break;
-            case '\n':
-                menuActive = false;
-                break;
-        }
-        menuSel = (menuSel + menuL) % menuL;  // hold selection in options range
-        
-        box(menu_win, 0, 0); 
-        drawMenu(menu_win, menu_list, menuL, menuSel);
-        wrefresh(menu_win);
-    } while (menuActive && (ch = getch()) != KEY_F(2) && ch != 'q');
-    
-    if (ch == KEY_F(2) || ch == 'q') {  // if player pressed F2 or q - exit
-        endwin();
-        exit(0);
-    }
 
-    int ai_mode = menu_list[menuSel].code;
+    Menu *ai_mode_menu = create_menu("Choose AI mode",
+                                     0, 0, 20, 40,
+                                     4, ai_menu_opt);
+    if (run_menu(ai_mode_menu) == -1) {
+        endwin();
+        return 0;
+    }
+    int ai_mode = menu_selected(menu);
+    destroy_menu(ai_mode_menu)
+
     setMode(ai_mode);
-    
     clear();
     refresh();
 
@@ -92,6 +67,7 @@ int main(int argc, char** argv) {
     Cell turn;
     
     InputCode inputStatus;
+    int ch = 0;
     
     // game loop
     while (1) {
@@ -133,9 +109,7 @@ int main(int argc, char** argv) {
     
     mvprintw(0, 0, "To exit press F2 or q buttons!");
      
-    while ((ch = getch()) != KEY_F(2) && ch != 'q') {  // just wait for exit key
-        ;
-    }
+    while ((ch = getch()) != KEY_F(2) && ch != 'q');  // just wait for exit key
     
     endwin();
     return 0;

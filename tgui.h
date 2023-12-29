@@ -5,7 +5,8 @@
 #include "tictactoe.h"
 
 #define CELL_SIZE 5
-
+#define MAX_MENU_OPTION_NAME 32
+#define MAX_MENU_TITLE 128
 
 extern const int sideSize;
 
@@ -18,16 +19,27 @@ extern Symbol SSEL;
 extern Symbol SEMPTY;
 
 // For any menus
-typedef struct {
+typedef struct _MenuOption {
     int code;
-    char name[256];
+    char name[MAX_MENU_OPTION_NAME];
 } MenuOption;
 
-// Menu functions
-MenuOption getMenuOption(int code, char name[256]);
+typedef struct _Menu {
+    char title[MAX_MENU_TITLE];
+    WINDOW* window;
+    bool active;
 
-WINDOW* getMenuWin(int y, int x, int height, int width);
-void drawMenu(WINDOW* menuWin, MenuOption* menuList, int menuLen, int selected);
+    size_t opt_count;
+    MenuOption *opt;  // pointer to options array
+    size_t selected;
+} Menu;
+
+// Menu functions
+Menu *create_menu(const char *title, int x, int y, int h, int w, size_t opt_count, MenuOption* opt);
+void draw_menu(const Menu *menu);
+int run_menu(Menu *menu);
+int menu_selected(Menu *menu);
+void destroy_menu(Menu *menu);
 
 // Game map functions
 void convertPosition(Cell* position, int* y, int* x);
