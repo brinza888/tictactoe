@@ -33,6 +33,8 @@ typedef struct _Game {
     int turn_count;
 } Game;
 
+const char *player_name(Player player);
+
 Cell cell(int row, int col);
 char field2char(FieldT field);
 FieldT char2field(char ch);

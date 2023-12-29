@@ -9,9 +9,6 @@
 #include "tgui.h"
 
 
-char* winnerNames[] = {"Empty", "Cross", "Zero"};
-
-
 int main(int argc, char* argv[]) {
     initscr();
     raw();
@@ -99,7 +96,7 @@ int main(int argc, char* argv[]) {
 
         if (game->winner != EMPTY) {
             attron(COLOR_PAIR((game->winner == CROSS) ? 2 : 3));
-            mvprintw(2, 5, "%s is the winner here!", winnerNames[game->winner]);
+            mvprintw(2, 5, "%s is the winner here!", player_name(game->winner));
             attroff(COLOR_PAIR((game->winner == CROSS) ? 2 : 3));
             refresh();
             break;

@@ -2,9 +2,23 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "tictactoe.h"
 
+
+const char *player_name(Player player) {
+    static char name[32];
+    switch (player) {
+    case CROSS:
+        strcpy(name, "Cross"); break;
+    case ZERO:
+        strcpy(name, "Zero"); break;
+    default:
+        strcpy(name, "-"); break;
+    }
+    return (const char *) name;
+}
 
 Cell cell(int row, int col) {
     Cell cl;
