@@ -3,48 +3,52 @@
 
 #include <stdbool.h>
 
-// size of game map
-#define SIZE 3  // cant be changed!
+// size of game map (cant be changed)
+#define MAP_SIZE 3
 
-// error codes for check_input
-typedef enum InputCode {
-    INPUT_OK,
-    NOTONMAP,
-    NOTEMPTY
-} InputCode;
+#define E_NOTINMAP  888001
+#define E_NOTEMPTY  888002
 
+typedef struct _Cell {
+    int row;
+    int col;
+} Cell;
 
-// cell type or player type
-typedef enum field {
+typedef enum _FieldT {
     EMPTY,
     CROSS,
     ZERO
 } FieldT;
 
-// cell structure
-typedef struct {
-    int row;
-    int col;
-} Cell;
+typedef FieldT Player;
+typedef FieldT **Map;
 
+typedef struct _Game {
+    Map map;
+    bool is_active;
+    bool is_draw;
+    bool is_turn_done;
+    Player player;
+    Player winner;
+    int turn_count;
+} Game;
 
-// Cell functions
-Cell Cell_create(int row, int col);
-
-// FieldT functions
-char field2char(FieldT fld);
+Cell cell(int row, int col);
+char field2char(FieldT field);
 FieldT char2field(char ch);
-FieldT switch_player(FieldT current);
+Player switch_player(Player current);
 
-// map functions
-void print_map(FieldT map[SIZE][SIZE]);
+Game *create_game(Player player);
+void destroy_game(Game *game);
+void print_map(const Map map);
 
-// check functions
-FieldT check_winner(FieldT map[SIZE][SIZE]);
-bool is_draw(FieldT map[SIZE][SIZE]);
+Player check_winner(const Map map);
+bool check_draw(const Map map);
 
-// check posibility of turn
-InputCode check_input(FieldT map[SIZE][SIZE], Cell turn);
+int check_turn(const Game *game, Cell turn);
+
+int make_turn(Game *game, Cell turn);
+void finalize_turn(Game *game);
 
 #endif
 

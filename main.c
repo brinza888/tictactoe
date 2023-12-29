@@ -9,12 +9,10 @@
 #include "tgui.h"
 
 
-InputCode chooseCell(WINDOW* mapWin, FieldT (*map)[SIZE][SIZE], Cell* selection);
-
 char* winnerNames[] = {"Empty", "Cross", "Zero"};
 
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
     initscr();
     raw();
     noecho();
@@ -30,133 +28,96 @@ int main(int argc, char** argv) {
     refresh();
     
     MenuOption ai_menu_opt[] = {
-        {MODE_EASY, "Easy"},
+        {MODE_EASY,   "Easy"},
         {MODE_MEDIUM, "Medium"},
-        {MODE_HARD, "Hard"},
+        {MODE_HARD,   "Hard"},
         {MODE_EXPERT, "Expert"}
     };
 
     Menu *ai_mode_menu = create_menu("Choose AI mode",
                                      0, 0, 20, 40,
                                      4, ai_menu_opt);
+
     if (run_menu(ai_mode_menu) == -1) {
+        destroy_menu(ai_mode_menu);
         endwin();
         return 0;
     }
-    int ai_mode = menu_selected(menu);
-    destroy_menu(ai_mode_menu)
 
-    setMode(ai_mode);
+    int ai_mode = menu_selected(ai_mode_menu);
+
+    destroy_menu(ai_mode_menu);
     clear();
     refresh();
 
-    // internal map
-    FieldT map[SIZE][SIZE];
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            map[i][j] = EMPTY;
-        }
-    }
-    
-    // map window
-    WINDOW* map_win = getMapWin(3, 5);
+    Game *game = create_game(CROSS);
+    WINDOW* game_win = game_window(3, 5);
 
-    FieldT currentPlayer = CROSS;
-    FieldT winner = EMPTY;
-
-    Cell turn;
-    
-    InputCode inputStatus;
+    Cell selection = {0, 0};
     int ch = 0;
+    bool do_make_turn = false;
     
     // game loop
-    while (1) {
-         
-        if (currentPlayer == CROSS) {
-            inputStatus = chooseCell(map_win, &map, &turn);
-            if (inputStatus == NOTONMAP) {  // if player pressed F2 or q - exit
-                endwin();
-                exit(0);
+    while (true) {
+        timeout(1);
+        ch = getch();
+
+        switch (ch) {
+            case KEY_UP: selection.row--; break;
+            case KEY_DOWN: selection.row++; break;
+            case KEY_LEFT: selection.col--; break;
+            case KEY_RIGHT: selection.col++; break;
+            case '\n':
+                do_make_turn = true;
+                break;
+        }
+
+        if (game->player == CROSS && do_make_turn) {
+            do_make_turn = false;
+            if (make_turn(game, selection) == E_NOTEMPTY) {
+                attron(COLOR_PAIR(1));
+                mvprintw(2, 5, "Cell not empty!");
+                refresh();
+                attroff(COLOR_PAIR(1));
             }
         }
-        else {
-            ai_minimax(&map, &turn, currentPlayer, 0);
+        
+        if (game->player == ZERO) {
+            ai_make_turn(game, ai_mode);
         }
-        
-        map[turn.row][turn.col] = currentPlayer;
-        
-        // draw situation on map
-        drawMap(map_win, 0, 0);
-        drawSymbols(map_win, &map);
-        wrefresh(map_win);
 
-        winner = check_winner(map);  // if win
-        if (winner != EMPTY) {
-            attron(COLOR_PAIR((winner == CROSS) ? 2 : 3));
-            mvprintw(2, 5, "%s is winner here!", winnerNames[winner]);
-            attroff(COLOR_PAIR((winner == CROSS) ? 2 : 3));
+        finalize_turn(game);
+
+        draw_map(game_win, 0, 0);
+        draw_symbols(game_win, game->map);
+
+        wattron(game_win, COLOR_PAIR(4));
+        place_symbol(game_win, selection, &SSEL);
+        wattroff(game_win, COLOR_PAIR(4));
+
+        wrefresh(game_win);
+
+        if (game->winner != EMPTY) {
+            attron(COLOR_PAIR((game->winner == CROSS) ? 2 : 3));
+            mvprintw(2, 5, "%s is the winner here!", winnerNames[game->winner]);
+            attroff(COLOR_PAIR((game->winner == CROSS) ? 2 : 3));
             refresh();
             break;
         }
-        if (is_draw(map)) {  // if draw
+
+        if (game->is_draw) {
             mvprintw(2, 5, "It is draw!");
             refresh();
             break;
         }
-
-        currentPlayer = switch_player(currentPlayer);
     }
     
     mvprintw(0, 0, "To exit press F2 or q buttons!");
-     
-    while ((ch = getch()) != KEY_F(2) && ch != 'q');  // just wait for exit key
+    while ((ch = getch()) != KEY_F(2) && ch != 'q');  // wait user for exit
     
+    destroy_game(game);
+    delwin(game_win);
     endwin();
+
     return 0;
 }
-
-
-InputCode chooseCell(WINDOW* mapWin, FieldT (*map)[SIZE][SIZE], Cell* selection) {
-    int ch;
-    InputCode inputStatus = NOTONMAP;
-    selection->row = 0;
-    selection->col = 0;
-    do {
-        inputStatus = NOTONMAP;
-        switch (ch) {
-            case KEY_UP: selection->row--; break;
-            case KEY_DOWN: selection->row++; break;
-            case KEY_LEFT: selection->col--; break;
-            case KEY_RIGHT: selection->col++; break;
-            case '\n':
-                inputStatus = check_input(*map, *selection);
-                break;
-        }
-        if (inputStatus == INPUT_OK) {
-            break;
-        }
-        else if (inputStatus == NOTEMPTY) {
-            attron(COLOR_PAIR(1));
-            mvprintw(2, 5, "Cell not empty!");
-            refresh();
-            attroff(COLOR_PAIR(1));
-        }
-        else {
-            clear();
-            refresh();
-        }
-        
-        selection->col = (selection->col + SIZE) % SIZE;  // hold selection in cells range
-        selection->row = (selection->row + SIZE) % SIZE;
-        
-        drawMap(mapWin, 0, 0);
-        drawSymbols(mapWin, map);
-        wattron(mapWin, COLOR_PAIR(4));
-        placeSymbol(mapWin, selection, &SSEL);
-        wattroff(mapWin, COLOR_PAIR(4));
-        wrefresh(mapWin);
-    } while ((ch = getch()) != KEY_F(2) && ch != 'q');
-
-    return inputStatus;
-}
-

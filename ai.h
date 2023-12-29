@@ -3,25 +3,17 @@
 
 #include "tictactoe.h"
 
-#define MODE_EASY 1
-#define MODE_MEDIUM 2
-#define MODE_HARD 3
-#define MODE_EXPERT 0
+#define MODE_EASY 0
+#define MODE_MEDIUM 1
+#define MODE_HARD 2
+#define MODE_EXPERT -1
 
+int get_moves(const Map map, Cell *moves);
 
-// random integer from a to b
-int randrange(int a, int b);
+int ai_minimax(Map map, Player player, Cell *turn, int depth, int depthMax);
+void ai_random(Map map, Cell* turn);
 
-// minimax depth control
-int getMode();
-void setMode(int value);
-
-// service functions
-int getMoves(FieldT (*map)[SIZE][SIZE], Cell** moves, size_t* n);
-
-// turns functions
-int ai_minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth);
-void ai_random(FieldT (*map)[SIZE][SIZE], Cell* turn);
+void ai_make_turn(Game *game, int ai_mode);
 
 #endif
 

@@ -3,105 +3,74 @@
 
 #include "tictactoe.h"
 #include "ai.h"
+#include "utils.h"
 
 
-static int depthMode = MODE_EXPERT;
-
-
-int randrange(int a, int b) {
-    return rand() % (b - a + 1) + a;
-}
-
-
-int getMode() {
-    return depthMode;
-}
-
-void setMode(int value) {
-    depthMode = value;
-}
-
-
-int getMoves(FieldT (*map)[SIZE][SIZE], Cell** moves, size_t* n) {
-    if (*n < 1 || *moves == NULL) {
-        *n = sizeof(Cell);
-        *moves = (Cell*) malloc(*n);
-    }
+int get_moves(const Map map, Cell *moves) {
     int count = 0;
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            if ((*map)[i][j] != EMPTY) {
+    for (int i = 0; i < MAP_SIZE; i++) {
+        for (int j = 0; j < MAP_SIZE; j++) {
+            if (map[i][j] != EMPTY) {
                 continue;
             }
-            count++;
-            if (*n < count * sizeof(Cell)) {
-                *n += sizeof(Cell);
-                *moves = (Cell*) realloc(*moves, *n);
-                if (!moves) {
-                    fprintf(stderr, "Not enough memory!\n");
-                    exit(1);
-                }
-            }
-            (*moves)[count - 1] = Cell_create(i, j);
+            moves[count++] = cell(i, j);
         }
     }
     return count;
 }
 
-
-int ai_minimax(FieldT (*map)[SIZE][SIZE], Cell* turn, FieldT player, int depth) {
-    turn->row = -1;
-    turn->col = -1;
-    
-    FieldT winner = check_winner(*map);
+int ai_minimax(Map map, Player player, Cell *turn, int depth, int depthMax) {
+    Player winner = check_winner(map);
     if (winner != EMPTY) {
         return (winner == ZERO) ? 10 : -10;
-    } 
-    if (is_draw(*map) || (depthMode != 0 && depth > depthMode)) {
+    }
+    if (check_draw(map) || (depthMax != -1 && depth > depthMax)) {
         return 0;
     }
     
-    Cell* moves;
-    int count = 0;
-    size_t allocated = 0;
-    count = getMoves(map, &moves, &allocated);
+    Cell moves[MAP_SIZE * MAP_SIZE];
+    int moves_count = get_moves(map, moves);
 
-    Cell* ch_move;
+    int best_move;
     int mnmx = (player == ZERO) ? -20 : 20;  // optimized value
     int res = 0;  // last minimax value
-    int rw, cl;  // make move
+    int row, col;   // make move
     
-    for (int i = 0; i < count; i++) {
-        rw = moves[i].row;
-        cl = moves[i].col;
-
-        (*map)[rw][cl] = player;
-
-        res = ai_minimax(map, turn, switch_player(player), depth + 1);
-
+    for (int i = 0; i < moves_count; i++) {
+        row = moves[i].row;
+        col = moves[i].col;
+        map[row][col] = player;  // asume player make turn with this move
+        res = ai_minimax(map, switch_player(player), NULL, depth + 1, depthMax);
+        map[row][col] = EMPTY;   // restore map to previous state
         if ((player == ZERO && res > mnmx) || (player == CROSS && res < mnmx)) {
             mnmx = res;
-            ch_move = moves + i;
+            best_move = i;
         }
-        
-        (*map)[rw][cl] = EMPTY;
     }
 
-    turn->row = ch_move->row;
-    turn->col = ch_move->col;
-    
-    free(moves);    
+    if (turn != NULL) {
+        turn->row = moves[best_move].row;
+        turn->col = moves[best_move].col;
+    }
 
     return mnmx;
 }
 
-
-void ai_random(FieldT (*map)[SIZE][SIZE], Cell* turn) {
-    Cell* moves;
-    size_t allocated = 0;
-    int count = 0;
-    count = getMoves(map, &moves, &allocated);
-    int r_i = randrange(0, count - 1);
-    *turn = moves[r_i];
+void ai_random(Map map, Cell* turn) {
+    Cell moves[MAP_SIZE * MAP_SIZE];
+    int moves_count = get_moves(map, moves);
+    int move = randrange(0, moves_count - 1);
+    turn->row = moves[move].row;
+    turn->col = moves[move].col;
 }
 
+void ai_make_turn(Game *game, int ai_mode) {
+    Cell turn;
+    if (ai_mode == MODE_EASY) {
+        ai_random(game->map, &turn);
+    }
+    else {
+        ai_minimax(game->map, game->player, &turn, 0, ai_mode);
+    }
+    make_turn(game, turn);
+}

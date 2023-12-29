@@ -9,7 +9,7 @@
 #include "tgui.h"
 
 
-const int sideSize = SIZE * (CELL_SIZE + 1) + 1;
+const int sideSize = MAP_SIZE * (CELL_SIZE + 1) + 1;
 
 Symbol SCROSS = {
     {' ', ' ', ' ', ' ', ' '},
@@ -104,7 +104,7 @@ int run_menu(Menu *menu) {
     return menu->selected;
 }
 
-int get_selected(Menu *menu) {
+int menu_selected(Menu *menu) {
     return menu->opt[menu->selected].code;
 }
 
@@ -116,58 +116,58 @@ void destroy_menu(Menu *menu) {
 
 // Game map functions
 
-WINDOW* getMapWin(int y, int x) {
-    WINDOW* mapWin = newwin(sideSize, sideSize, y, x); 
-    wrefresh(mapWin);
-    return mapWin;
+WINDOW* game_window(int y, int x) {
+    WINDOW* game_win = newwin(sideSize, sideSize, y, x); 
+    wrefresh(game_win);
+    return game_win;
 }
 
-void convertPosition(Cell* position, int* y, int* x) {
-    *x = 1 + position->col * (CELL_SIZE + 1);
-    *y = 1 + position->row * (CELL_SIZE + 1); 
+void convert_position(Cell pos, int *y, int *x) {
+    *x = 1 + pos.col * (CELL_SIZE + 1);
+    *y = 1 + pos.row * (CELL_SIZE + 1); 
 }
 
-void drawMap(WINDOW* mapWin, int y, int x) {
+void draw_map(WINDOW* game_win, int y, int x) {
     for (int j = 0; j < sideSize; j++) { 
         for (int i = 0; i < sideSize; i++) {
             if (j == 0 || j == sideSize - 1) {
                 if (i == 0) {
-                    mvwaddch(mapWin, y + j, x + i, (j == 0) ? ACS_ULCORNER : ACS_LLCORNER);
+                    mvwaddch(game_win, y + j, x + i, (j == 0) ? ACS_ULCORNER : ACS_LLCORNER);
                 }
                 else if (i == sideSize - 1) {
-                    mvwaddch(mapWin, y + j, x + i, (j == 0) ? ACS_URCORNER : ACS_LRCORNER);
+                    mvwaddch(game_win, y + j, x + i, (j == 0) ? ACS_URCORNER : ACS_LRCORNER);
                 }
                 else if (i % (CELL_SIZE + 1) == 0) {
-                    mvwaddch(mapWin, y + j, x + i, (j == 0) ? ACS_TTEE : ACS_BTEE);
+                    mvwaddch(game_win, y + j, x + i, (j == 0) ? ACS_TTEE : ACS_BTEE);
                 }
                 else {
-                    mvwaddch(mapWin, y + j, x + i, ACS_HLINE);
+                    mvwaddch(game_win, y + j, x + i, ACS_HLINE);
                 }
             }
             else if (j % (CELL_SIZE + 1) == 0) {
                 if ((i == 0) | (i == sideSize - 1)) {
-                    mvwaddch(mapWin, y + j, x + i, (i == 0) ? ACS_LTEE : ACS_RTEE);
+                    mvwaddch(game_win, y + j, x + i, (i == 0) ? ACS_LTEE : ACS_RTEE);
                 }
                 else if (i % (CELL_SIZE + 1) == 0) {
-                    mvwaddch(mapWin, y + j, x + i, ACS_PLUS);
+                    mvwaddch(game_win, y + j, x + i, ACS_PLUS);
                 }
                 else {
-                    mvwaddch(mapWin, y + j, x + i, ACS_HLINE);
+                    mvwaddch(game_win, y + j, x + i, ACS_HLINE);
                 }
             }
             else {
                 if ((i == 0) || (i == sideSize - 1)) {
-                    mvwaddch(mapWin, y + j, x + i, ACS_VLINE);
+                    mvwaddch(game_win, y + j, x + i, ACS_VLINE);
                 }
                 else if (i % (CELL_SIZE + 1) == 0) {
-                    mvwaddch(mapWin, y + j, x + i, ACS_VLINE);
+                    mvwaddch(game_win, y + j, x + i, ACS_VLINE);
                 }
             }
         }
     }
 }
 
-Symbol* getSymbol(FieldT player) {
+Symbol* get_symbol(Player player) {
     switch (player) {
         case CROSS: return &SCROSS;
         case ZERO: return &SZERO;
@@ -175,25 +175,24 @@ Symbol* getSymbol(FieldT player) {
     }
 }
 
-void placeSymbol(WINDOW* mapWin, Cell* position, Symbol* symb) {
-    int wy, wx;
-    convertPosition(position, &wy, &wx);
+void place_symbol(WINDOW* game_win, Cell pos, Symbol* symb) {
+    int y, x;
+    convert_position(pos, &y, &x);
     for (int i = 0; i < CELL_SIZE; i++) {
         for (int j = 0; j < CELL_SIZE; j++) {
             if ((*symb)[i][j] == '\0') {
                 continue;
             }
-            mvwaddch(mapWin, wy + i, wx + j, (*symb)[i][j]);
+            mvwaddch(game_win, y + i, x + j, (*symb)[i][j]);
         }
     }
 }
 
-void drawSymbols(WINDOW* mapWin, FieldT (*map)[SIZE][SIZE]) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            Symbol* symb = getSymbol((*map)[i][j]);
-            Cell pos = Cell_create(i, j);
-            placeSymbol(mapWin, &pos, symb);
+void draw_symbols(WINDOW* game_win, Map map) {
+    for (int i = 0; i < MAP_SIZE; i++) {
+        for (int j = 0; j < MAP_SIZE; j++) {
+            Symbol* symb = get_symbol(map[i][j]);
+            place_symbol(game_win, cell(i, j), symb);
         }
     }
 }

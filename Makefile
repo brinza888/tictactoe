@@ -4,7 +4,7 @@ CFLAGS = -Wall
 BIN = bin/
 EXE = ttt
 
-SOURCES = tictactoe.c ai.c tgui.c main.c
+SOURCES = tictactoe.c ai.c tgui.c main.c utils.c
 OBJECTS = $(addprefix $(BIN), $(SOURCES:.c=.o))
 
 .PHONY: all

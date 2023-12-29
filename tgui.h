@@ -42,13 +42,13 @@ int menu_selected(Menu *menu);
 void destroy_menu(Menu *menu);
 
 // Game map functions
-void convertPosition(Cell* position, int* y, int* x);
-Symbol* getSymbol(FieldT player);
+void convert_position(Cell position, int *y, int *x);
+Symbol* get_symbol(Player player);
 
-WINDOW* getMapWin(int y, int x);
-void drawMap(WINDOW* mapWin, int y, int x);
-void drawSymbols(WINDOW* mapWin, FieldT (*map)[SIZE][SIZE]);
-void placeSymbol(WINDOW* mapWin, Cell* position, Symbol* symb);
+WINDOW* game_window(int y, int x);
+void draw_map(WINDOW* game_win, int y, int x);
+void place_symbol(WINDOW* game_win, Cell pos, Symbol* symb);
+void draw_symbols(WINDOW* game_win, Map map);
 
 
 #endif
