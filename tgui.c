@@ -86,6 +86,8 @@ void draw_menu(const Menu *menu) {
 }
 
 int run_menu(Menu *menu) {
+    clear();
+    refresh();
     menu->active = true;
     int ch;
     do {

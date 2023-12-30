@@ -5,7 +5,7 @@ LDFLAGS := -lncurses
 BIN := bin/
 EXE := ttt
 
-SOURCES = tictactoe.c ai.c tgui.c main.c utils.c
+SOURCES = tictactoe.c ai.c tgui.c game.c main.c utils.c
 OBJECTS = $(addprefix $(BIN), $(SOURCES:.c=.o))
 EXE := $(addprefix $(BIN), $(EXE))
 

@@ -10,10 +10,13 @@
 
 int get_moves(const Map map, Cell *moves);
 
+void set_ai_mode(int ai_mode);
+int get_ai_mode();
+
 int ai_minimax(Map map, Player player, Cell *turn, int depth, int depthMax);
 void ai_random(Map map, Cell* turn);
 
-void ai_make_turn(Game *game, int ai_mode);
+Cell ai_turn(Game *game);
 
 #endif
 

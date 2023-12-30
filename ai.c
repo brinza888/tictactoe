@@ -6,6 +6,16 @@
 #include "utils.h"
 
 
+static int AI_Mode = MODE_EASY;
+
+void set_ai_mode(int ai_mode) {
+    AI_Mode = ai_mode;
+}
+
+int get_ai_mode() {
+    return AI_Mode;
+}
+
 int get_moves(const Map map, Cell *moves) {
     int count = 0;
     for (int i = 0; i < MAP_SIZE; i++) {
@@ -64,13 +74,13 @@ void ai_random(Map map, Cell* turn) {
     turn->col = moves[move].col;
 }
 
-void ai_make_turn(Game *game, int ai_mode) {
+Cell ai_turn(Game *game) {
     Cell turn;
-    if (ai_mode == MODE_EASY) {
+    if (AI_Mode == MODE_EASY) {
         ai_random(game->map, &turn);
     }
     else {
-        ai_minimax(game->map, game->player, &turn, 0, ai_mode);
+        ai_minimax(game->map, game->player, &turn, 0, AI_Mode);
     }
-    make_turn(game, turn);
+    return turn;
 }
