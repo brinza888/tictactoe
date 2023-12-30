@@ -26,11 +26,11 @@ Symbol SZERO = {
     {' ', ' ', ' ', ' ', ' '}};
 
 Symbol SSEL = {
-    {'X', ' ', '\0', ' ', 'X'},
-    {' ', '\0', '\0', '\0', ' '},
-    {' ', '\0', '\0', '\0', '\0'},
-    {' ', '\0', '\0', '\0', ' '},
-    {'X', ' ', '\0', ' ', 'X'}};
+    {'X', '\0', '\0', '\0', 'X'},
+    {'\0', '\0', '\0', '\0', '\0'},
+    {'\0', '\0', '\0', '\0', '\0'},
+    {'\0', '\0', '\0', '\0', '\0'},
+    {'X', '\0', '\0', '\0', 'X'}};
 
 Symbol SEMPTY = {
     {' ', ' ', ' ', ' ', ' '},
@@ -49,7 +49,8 @@ Menu *create_menu(const char *title, int x, int y, int h, int w, size_t opt_coun
     menu->opt_count = opt_count;
     menu->opt = opt;
     menu->selected = 0;
-    menu->active = true;
+    menu->active = false;
+    menu->error = false;
     strcpy(menu->title, title);
     return menu;
 }
@@ -64,8 +65,14 @@ void draw_menu(const Menu *menu) {
     int x = w / 2;
 
     wclear(menu->window);
-    mvwprintw(menu->window, 1, w / 2 - 7, "%s", menu->title);
+    mvwprintw(menu->window, 1, (w - strlen(menu->title)) / 2, "%s", menu->title);
     box(menu->window, 0, 0);
+
+    if (menu->error) {
+        wattron(menu->window, COLOR_PAIR(1));
+        mvwprintw(menu->window, 3, (w - strlen(menu->last_error)) / 2, "%s", menu->last_error);
+        wattroff(menu->window, COLOR_PAIR(1));
+    }
 
     for (size_t i = 0; i < menu->opt_count; i++) {
         opt = menu->opt + i;
@@ -79,6 +86,7 @@ void draw_menu(const Menu *menu) {
 }
 
 int run_menu(Menu *menu) {
+    menu->active = true;
     int ch;
     do {
         // switch selection
@@ -94,6 +102,7 @@ int run_menu(Menu *menu) {
         // draw menu and refresh
         draw_menu(menu);
         wrefresh(menu->window);
+        menu->error = false;
     } while (menu->active && (ch = getch()) != KEY_F(2) && ch != 'q');
     
     // if player pressed F2 or q - return negative
@@ -106,6 +115,12 @@ int run_menu(Menu *menu) {
 
 int menu_selected(Menu *menu) {
     return menu->opt[menu->selected].code;
+}
+
+void menu_error(Menu *menu, const char *error) {
+    strncpy(menu->last_error, error, MAX_MENU_TITLE);
+    menu->last_error[MAX_MENU_TITLE - 1] = '\0';
+    menu->error = true;
 }
 
 void destroy_menu(Menu *menu) {

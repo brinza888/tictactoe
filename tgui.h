@@ -29,6 +29,9 @@ typedef struct _Menu {
     WINDOW* window;
     bool active;
 
+    bool error;
+    char last_error[MAX_MENU_TITLE];
+
     size_t opt_count;
     MenuOption *opt;  // pointer to options array
     size_t selected;
@@ -39,6 +42,7 @@ Menu *create_menu(const char *title, int x, int y, int h, int w, size_t opt_coun
 void draw_menu(const Menu *menu);
 int run_menu(Menu *menu);
 int menu_selected(Menu *menu);
+void menu_error(Menu *menu, const char *error);
 void destroy_menu(Menu *menu);
 
 // Game map functions

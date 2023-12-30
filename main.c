@@ -9,6 +9,12 @@
 #include "tgui.h"
 
 
+#define GM_AI 0
+#define GM_BOTH 1
+#define GM_HOST_NET 2
+#define GM_JOIN_NET 3
+
+
 int main(int argc, char* argv[]) {
     initscr();
     raw();
@@ -23,6 +29,31 @@ int main(int argc, char* argv[]) {
     init_pair(4, COLOR_YELLOW, COLOR_BLACK);
     
     refresh();
+
+    MenuOption gm_menu_opt[] = {
+        {GM_AI, "Against AI"},
+        {GM_BOTH, "Two players"},
+        {GM_HOST_NET, "Host network game"},
+        {GM_JOIN_NET, "Join network game"}
+    };
+    Menu *gm_menu = create_menu("Choose game mode", 0, 0, 20, 40, 4, gm_menu_opt);
+
+    int gm_mode;
+    while (true) {
+        if (run_menu(gm_menu) == -1) {
+            destroy_menu(gm_menu);
+            endwin();
+            return 0;
+        }
+        gm_mode = mnu_selected(gm_menu);
+        if (gm_mode == GM_AI) {
+            break;
+        }
+        else {
+            menu_error(gm_menu, "Feature not implemented");
+        }
+    }
+    destroy_menu(gm_menu);
     
     MenuOption ai_menu_opt[] = {
         {MODE_EASY,   "Easy"},
@@ -30,20 +61,16 @@ int main(int argc, char* argv[]) {
         {MODE_HARD,   "Hard"},
         {MODE_EXPERT, "Expert"}
     };
-
-    Menu *ai_mode_menu = create_menu("Choose AI mode",
-                                     0, 0, 20, 40,
-                                     4, ai_menu_opt);
+    Menu *ai_mode_menu = create_menu("Choose AI mode", 0, 0, 20, 40, 4, ai_menu_opt);
 
     if (run_menu(ai_mode_menu) == -1) {
         destroy_menu(ai_mode_menu);
         endwin();
         return 0;
     }
-
     int ai_mode = menu_selected(ai_mode_menu);
-
     destroy_menu(ai_mode_menu);
+
     clear();
     refresh();
     timeout(0);
