@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
             endwin();
             return 0;
         }
-        gm_mode = mnu_selected(gm_menu);
+        gm_mode = menu_selected(gm_menu);
         if (gm_mode == GM_AI) {
             break;
         }
