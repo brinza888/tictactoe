@@ -50,28 +50,27 @@ int main(int argc, char* argv[]) {
     Game *game = create_game(CROSS);
     WINDOW* game_win = game_window(3, 5);
 
-    Cell selection = {0, 0};
+    bool running = true;
+    Cell sel = {0, 0};  // selection
     int ch = 0;
     bool do_make_turn = false;
     
     // game loop
-    while (true) {
+    while (running) {
         timeout(1);
         ch = getch();
 
         switch (ch) {
-            case KEY_UP: selection.row--; break;
-            case KEY_DOWN: selection.row++; break;
-            case KEY_LEFT: selection.col--; break;
-            case KEY_RIGHT: selection.col++; break;
-            case '\n':
-                do_make_turn = true;
-                break;
+            case KEY_UP:    sel.row = (sel.row - 1 + MAP_SIZE) % MAP_SIZE; break;
+            case KEY_DOWN:  sel.row = (sel.row + 1) % MAP_SIZE;            break;
+            case KEY_LEFT:  sel.col = (sel.col - 1 + MAP_SIZE) % MAP_SIZE; break;
+            case KEY_RIGHT: sel.col = (sel.col + 1) % MAP_SIZE;            break;
+            case '\n':      do_make_turn = true;                           break;
         }
 
         if (game->player == CROSS && do_make_turn) {
             do_make_turn = false;
-            if (make_turn(game, selection) == E_NOTEMPTY) {
+            if (make_turn(game, sel) == E_NOTEMPTY) {
                 attron(COLOR_PAIR(1));
                 mvprintw(2, 5, "Cell not empty!");
                 refresh();
@@ -89,7 +88,7 @@ int main(int argc, char* argv[]) {
         draw_symbols(game_win, game->map);
 
         wattron(game_win, COLOR_PAIR(4));
-        place_symbol(game_win, selection, &SSEL);
+        place_symbol(game_win, sel, &SSEL);
         wattroff(game_win, COLOR_PAIR(4));
 
         wrefresh(game_win);
@@ -99,17 +98,20 @@ int main(int argc, char* argv[]) {
             mvprintw(2, 5, "%s is the winner here!", player_name(game->winner));
             attroff(COLOR_PAIR((game->winner == CROSS) ? 2 : 3));
             refresh();
-            break;
+            running = false;
         }
 
         if (game->is_draw) {
             mvprintw(2, 5, "It is draw!");
             refresh();
-            break;
+            running = false;
         }
+
+        if (ch == KEY_F(2) || ch == 'q')
+            running = false;
     }
     
-    mvprintw(0, 0, "To exit press F2 or q buttons!");
+    mvprintw(0, 0, "End of game! To exit press: F2 or Q");
     while ((ch = getch()) != KEY_F(2) && ch != 'q');  // wait user for exit
     
     destroy_game(game);
