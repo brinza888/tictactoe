@@ -14,6 +14,8 @@
 #define GM_HOST_NET 2
 #define GM_JOIN_NET 3
 
+int game_ai();  // game with AI
+
 
 int main(int argc, char* argv[]) {
     initscr();
@@ -27,8 +29,6 @@ int main(int argc, char* argv[]) {
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
     init_pair(3, COLOR_BLUE, COLOR_BLACK);
     init_pair(4, COLOR_YELLOW, COLOR_BLACK);
-    
-    refresh();
 
     MenuOption gm_menu_opt[] = {
         {GM_AI, "Against AI"},
@@ -40,21 +40,31 @@ int main(int argc, char* argv[]) {
 
     int gm_mode;
     while (true) {
+        clear();
+        refresh();
+
         if (run_menu(gm_menu) == -1) {
-            destroy_menu(gm_menu);
-            endwin();
-            return 0;
-        }
-        gm_mode = menu_selected(gm_menu);
-        if (gm_mode == GM_AI) {
             break;
         }
-        else {
-            menu_error(gm_menu, "Feature not implemented");
+        gm_mode = menu_selected(gm_menu);
+
+        switch (gm_mode) {
+        case GM_AI:
+            game_ai();
+            break;
+        default:
+            menu_error(gm_menu, "Feature is not implemented");
+            break;
         }
     }
+
     destroy_menu(gm_menu);
-    
+    endwin();
+
+    return 0;   
+}
+
+int game_ai() {
     MenuOption ai_menu_opt[] = {
         {MODE_EASY,   "Easy"},
         {MODE_MEDIUM, "Medium"},
@@ -62,18 +72,12 @@ int main(int argc, char* argv[]) {
         {MODE_EXPERT, "Expert"}
     };
     Menu *ai_mode_menu = create_menu("Choose AI mode", 0, 0, 20, 40, 4, ai_menu_opt);
-
     if (run_menu(ai_mode_menu) == -1) {
         destroy_menu(ai_mode_menu);
-        endwin();
         return 0;
     }
     int ai_mode = menu_selected(ai_mode_menu);
     destroy_menu(ai_mode_menu);
-
-    clear();
-    refresh();
-    timeout(0);
 
     Game *game = create_game(CROSS);
     WINDOW* game_win = game_window(3, 5);
@@ -82,6 +86,10 @@ int main(int argc, char* argv[]) {
     Cell sel = {0, 0};  // selection
     int ch = 0;
     bool do_make_turn = false;
+
+    clear();
+    refresh();
+    timeout(0);
     
     // game loop
     while (running) {
@@ -144,7 +152,6 @@ int main(int argc, char* argv[]) {
     
     destroy_game(game);
     delwin(game_win);
-    endwin();
 
     return 0;
 }
