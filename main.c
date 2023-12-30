@@ -110,7 +110,8 @@ int main(int argc, char* argv[]) {
         if (ch == KEY_F(2) || ch == 'q')
             running = false;
     }
-    
+
+    timeout(-1);
     mvprintw(0, 0, "End of game! To exit press: F2 or Q");
     while ((ch = getch()) != KEY_F(2) && ch != 'q');  // wait user for exit
     
