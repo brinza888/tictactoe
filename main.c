@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
     destroy_menu(ai_mode_menu);
     clear();
     refresh();
+    timeout(0);
 
     Game *game = create_game(CROSS);
     WINDOW* game_win = game_window(3, 5);
@@ -57,7 +58,6 @@ int main(int argc, char* argv[]) {
     
     // game loop
     while (running) {
-        timeout(1);
         ch = getch();
 
         switch (ch) {
