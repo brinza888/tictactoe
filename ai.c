@@ -23,7 +23,7 @@ int get_moves(const Map map, Cell *moves) {
             if (map[i][j] != EMPTY) {
                 continue;
             }
-            moves[count++] = cell(i, j);
+            moves[count++] = make_cell(i, j);
         }
     }
     return count;
@@ -74,13 +74,12 @@ void ai_random(Map map, Cell* turn) {
     turn->col = moves[move].col;
 }
 
-Cell ai_turn(Game *game) {
-    Cell turn;
+int ai_turn(GameLoop *gloop, Cell *turn) {
     if (AI_Mode == MODE_EASY) {
-        ai_random(game->map, &turn);
+        ai_random(gloop->game->map, turn);
     }
     else {
-        ai_minimax(game->map, game->player, &turn, 0, AI_Mode);
+        ai_minimax(gloop->game->map, gloop->game->player, turn, 0, AI_Mode);
     }
-    return turn;
+    return 0;
 }

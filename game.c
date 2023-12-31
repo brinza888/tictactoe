@@ -11,69 +11,90 @@ GameLoop *create_gloop(Game *game, Player host_player) {
     gloop->window = game_window(3, 5);
     gloop->running = false;
     gloop->host_player = host_player;
+    gloop->othr_player = switch_player(host_player);
     gloop->game = game;
+    gloop->row = create_sel(0, 0, MAP_SIZE - 1, false);
+    gloop->col = create_sel(0, 0, MAP_SIZE - 1, false);
+    gloop->enter_hit = false;
     gloop->host_turn = NULL;
     gloop->othr_turn = NULL;
     return gloop;
 }
 
-void set_host_turn(GameLoop *gloop, FHostTurn host_turn) {
+void set_host_turn(GameLoop *gloop, TurnFunc host_turn) {
     gloop->host_turn = host_turn;
 }
 
-void set_othr_turn(GameLoop *gloop, FOthrTurn othr_turn) {
+void set_othr_turn(GameLoop *gloop, TurnFunc othr_turn) {
     gloop->othr_turn = othr_turn;
+}
+
+int keyboard_turn(GameLoop *gloop, Cell *turn) {
+    if (gloop->enter_hit) {
+        turn->row = sel_val(gloop->row);
+        turn->col = sel_val(gloop->col);
+        return 0;
+    }
+    return 1;
 }
 
 int run_gloop(GameLoop *gloop) {
     int ch = 0;
-    bool do_make_turn = false;
-    Cell sel = {0, 0};
     Game *game = gloop->game;
+    Cell sel = {0, 0};
+    Cell turn = {0, 0};
 
     gloop->running = true;
+    bool turn_done = false;
 
     clear();
     refresh();
     timeout(0);
-    
+
     while (gloop->running) {
+        gloop->enter_hit = false;
+        turn_done = false;
+        
         ch = getch();
         switch (ch) {
-            case KEY_UP:    sel.row = (sel.row - 1 + MAP_SIZE) % MAP_SIZE; break;
-            case KEY_DOWN:  sel.row = (sel.row + 1) % MAP_SIZE;            break;
-            case KEY_LEFT:  sel.col = (sel.col - 1 + MAP_SIZE) % MAP_SIZE; break;
-            case KEY_RIGHT: sel.col = (sel.col + 1) % MAP_SIZE;            break;
-            case KEY_F(2):  gloop->running = false;                        break;
-            case 'q':       gloop->running = false;                        break;
-            case '\n':      do_make_turn = true;                           break;
+            case KEY_UP:    sel_prev(gloop->row);   break;
+            case KEY_DOWN:  sel_next(gloop->row);   break;
+            case KEY_LEFT:  sel_prev(gloop->col);   break;
+            case KEY_RIGHT: sel_next(gloop->col);   break;
+            case KEY_F(2):  gloop->running = false; break;
+            case 'q':       gloop->running = false; break;
+            case '\n':      gloop->enter_hit = true;    break;
+        }
+        sel.row = sel_val(gloop->row);
+        sel.col = sel_val(gloop->col);
+
+        if (game->player == gloop->host_player) {
+            if (gloop->host_turn(gloop, &turn) == 0) {
+                turn_done = true;
+            }
         }
 
-        if (game->player == gloop->host_player && do_make_turn) {
-            do_make_turn = false;
-            if (gloop->host_turn(game, sel) == E_NOTEMPTY) {
+        if (game->player == gloop->othr_player) {
+            if (gloop->othr_turn(gloop, &turn) == 0) {
+                turn_done = true;
+            }
+        }
+
+        if (turn_done) {
+            if (make_turn(game, turn) == E_NOTEMPTY) {
                 attron(COLOR_PAIR(1));
                 mvprintw(2, 5, "Cell not empty!");
                 attroff(COLOR_PAIR(1));
                 refresh();
             }
-        }
-        if (game->player == ZERO) {
-            Cell turn = gloop->othr_turn(game);  // wait other player for make turn
-            if (turn.row != -1 && turn.col != -1) {
-                make_turn(game, turn);
+            else {
+                finalize_turn(game);
             }
         }
 
-        finalize_turn(game);
-
-        draw_map(gloop->window, 0, 0);
-        draw_symbols(gloop->window, game->map);
-
-        wattron(gloop->window, COLOR_PAIR(4));
-        place_symbol(gloop->window, sel, &SSEL);
-        wattroff(gloop->window, COLOR_PAIR(4));
-
+        draw_grid(gloop->window);
+        draw_map(gloop->window, game->map);
+        draw_sel(gloop->window, sel);
         wrefresh(gloop->window);
 
         if (game->winner != EMPTY) {
@@ -89,6 +110,7 @@ int run_gloop(GameLoop *gloop) {
             gloop->running = false;
         }
     }
+
     timeout(-1);
 
     while ((ch = getch()) != KEY_F(2) && ch != 'q');
@@ -97,6 +119,8 @@ int run_gloop(GameLoop *gloop) {
 }
 
 void destroy_gloop(GameLoop *gloop) {
+    destroy_sel(gloop->row);
+    destroy_sel(gloop->col);
     delwin(gloop->window);
     free(gloop);
 }

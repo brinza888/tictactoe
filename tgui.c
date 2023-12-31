@@ -41,14 +41,14 @@ Symbol SEMPTY = {
 
 // Menu functions
 
-Menu *create_menu(const char *title, int x, int y, int h, int w, size_t opt_count, MenuOption* opt) {
+Menu *create_menu(const char *title, int x, int y, int h, int w, int opt_count, MenuOption* opt) {
     Menu *menu = calloc(sizeof(Menu), 1);
     menu->window = newwin(h, w, y, x);
     box(menu->window, 0, 0);
     wrefresh(menu->window);
     menu->opt_count = opt_count;
     menu->opt = opt;
-    menu->selected = 0;
+    menu->sel = create_sel(0, 0, opt_count - 1, true);
     menu->active = false;
     menu->error = false;
     strcpy(menu->title, title);
@@ -74,13 +74,15 @@ void draw_menu(const Menu *menu) {
         wattroff(menu->window, COLOR_PAIR(1));
     }
 
+    int selected = sel_val(menu->sel);
+
     for (size_t i = 0; i < menu->opt_count; i++) {
         opt = menu->opt + i;
         opt_name_len = strlen(opt->name);
-        if (i == menu->selected)
+        if (i == selected)
             wattron(menu->window, A_REVERSE);
         mvwprintw(menu->window, y + i, x - opt_name_len / 2, "%s", opt->name);
-        if (i == menu->selected)
+        if (i == selected)
             wattroff(menu->window, A_REVERSE);
     }
 }
@@ -93,14 +95,12 @@ int run_menu(Menu *menu) {
     do {
         // switch selection
         switch (ch) {
-            case KEY_UP: menu->selected--; break;
-            case KEY_DOWN: menu->selected++; break;
+            case KEY_UP:   sel_prev(menu->sel); break;
+            case KEY_DOWN: sel_next(menu->sel); break;
             case '\n':
                 menu->active = false;
                 break;
         }
-        // hold selection in options range
-        menu->selected = (menu->selected + menu->opt_count) % menu->opt_count;
         // draw menu and refresh
         draw_menu(menu);
         wrefresh(menu->window);
@@ -112,11 +112,11 @@ int run_menu(Menu *menu) {
         return -1;
     }
 
-    return menu->selected;
+    return sel_val(menu->sel);
 }
 
 int menu_selected(Menu *menu) {
-    return menu->opt[menu->selected].code;
+    return menu->opt[sel_val(menu->sel)].code;
 }
 
 void menu_error(Menu *menu, const char *error) {
@@ -126,6 +126,7 @@ void menu_error(Menu *menu, const char *error) {
 }
 
 void destroy_menu(Menu *menu) {
+    destroy_sel(menu->sel);
     delwin(menu->window);
     free(menu);
 }
@@ -144,7 +145,8 @@ void convert_position(Cell pos, int *y, int *x) {
     *y = 1 + pos.row * (CELL_SIZE + 1); 
 }
 
-void draw_map(WINDOW* game_win, int y, int x) {
+void draw_grid(WINDOW* game_win) {
+    int y = 0, x = 0;
     for (int j = 0; j < sideSize; j++) { 
         for (int i = 0; i < sideSize; i++) {
             if (j == 0 || j == sideSize - 1) {
@@ -192,7 +194,7 @@ Symbol* get_symbol(Player player) {
     }
 }
 
-void place_symbol(WINDOW* game_win, Cell pos, Symbol* symb) {
+void draw_symbol(WINDOW* game_win, Cell pos, Symbol* symb) {
     int y, x;
     convert_position(pos, &y, &x);
     for (int i = 0; i < CELL_SIZE; i++) {
@@ -205,13 +207,18 @@ void place_symbol(WINDOW* game_win, Cell pos, Symbol* symb) {
     }
 }
 
-void draw_symbols(WINDOW* game_win, Map map) {
+void draw_map(WINDOW* game_win, Map map) {
     for (int i = 0; i < MAP_SIZE; i++) {
         for (int j = 0; j < MAP_SIZE; j++) {
             Symbol* symb = get_symbol(map[i][j]);
-            place_symbol(game_win, cell(i, j), symb);
+            draw_symbol(game_win, make_cell(i, j), symb);
         }
     }
 }
 
+void draw_sel(WINDOW* game_win, Cell pos) {
+    wattron(game_win, COLOR_PAIR(4));
+    draw_symbol(game_win, pos, &SSEL);
+    wattroff(game_win, COLOR_PAIR(4));
+}
 

@@ -11,11 +11,12 @@
 
 
 #define GM_AI 0
-#define GM_BOTH 1
+#define GM_TWO 1
 #define GM_HOST_NET 2
 #define GM_JOIN_NET 3
 
-int game_ai();  // game with AI
+int game_ai();   // game with AI
+int game_two();  // game when two players use one PC
 
 
 int main(int argc, char* argv[]) {
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]) {
 
     MenuOption gm_menu_opt[] = {
         {GM_AI, "Against AI"},
-        {GM_BOTH, "Two players"},
+        {GM_TWO, "Two players"},
         {GM_HOST_NET, "Host network game"},
         {GM_JOIN_NET, "Join network game"}
     };
@@ -41,9 +42,6 @@ int main(int argc, char* argv[]) {
 
     int gm_mode;
     while (true) {
-        clear();
-        refresh();
-
         if (run_menu(gm_menu) == -1) {
             break;
         }
@@ -52,6 +50,9 @@ int main(int argc, char* argv[]) {
         switch (gm_mode) {
         case GM_AI:
             game_ai();
+            break;
+        case GM_TWO:
+            game_two();
             break;
         default:
             menu_error(gm_menu, "Feature is not implemented");
@@ -66,9 +67,6 @@ int main(int argc, char* argv[]) {
 }
 
 int game_ai() {
-    clear();
-    refresh();
-
     MenuOption ai_menu_opt[] = {
         {MODE_EASY,   "Easy"},
         {MODE_MEDIUM, "Medium"},
@@ -83,15 +81,31 @@ int game_ai() {
     }
     set_ai_mode(menu_selected(ai_mode_menu));
     destroy_menu(ai_mode_menu);
-    
+
     Game *game = create_game(CROSS);
     GameLoop *gloop = create_gloop(game, CROSS);
-    set_host_turn(gloop, (FHostTurn) &make_turn);
-    set_othr_turn(gloop, (FOthrTurn) &ai_turn);
+    set_host_turn(gloop, (TurnFunc) keyboard_turn);
+    set_othr_turn(gloop, (TurnFunc) ai_turn);
 
     int result = run_gloop(gloop);
 
     destroy_gloop(gloop);
+    destroy_game(game);
+
+    return result;
+}
+
+int game_two() {
+    // todo: implement this
+    Game *game = create_game(CROSS);
+    GameLoop *gloop = create_gloop(game, CROSS);
+    set_host_turn(gloop, (TurnFunc) keyboard_turn);
+    set_othr_turn(gloop, (TurnFunc) keyboard_turn);
+
+    int result = run_gloop(gloop);
+
+    destroy_gloop(gloop);
+    destroy_game(game);
 
     return result;
 }

@@ -20,13 +20,6 @@ const char *player_name(Player player) {
     return (const char *) name;
 }
 
-Cell cell(int row, int col) {
-    Cell cl;
-    cl.row = row;
-    cl.col = col;
-    return cl;
-}
-
 char field2char(FieldT field) {
     switch (field) {
         case CROSS: return 'X'; break;

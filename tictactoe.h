@@ -3,16 +3,14 @@
 
 #include <stdbool.h>
 
+#include "utils.h"
+
 // size of game map (cant be changed)
 #define MAP_SIZE 3
 
 #define E_NOTINMAP  888001
 #define E_NOTEMPTY  888002
 
-typedef struct _Cell {
-    int row;
-    int col;
-} Cell;
 
 typedef enum _FieldT {
     EMPTY,
@@ -35,7 +33,6 @@ typedef struct _Game {
 
 const char *player_name(Player player);
 
-Cell cell(int row, int col);
 char field2char(FieldT field);
 FieldT char2field(char ch);
 Player switch_player(Player current);

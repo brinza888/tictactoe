@@ -2,7 +2,9 @@
 #define TGUI_H
 
 #include <stdbool.h>
+
 #include "tictactoe.h"
+#include "utils.h"
 
 #define CELL_SIZE 5
 #define MAX_MENU_OPTION_NAME 32
@@ -32,13 +34,14 @@ typedef struct _Menu {
     bool error;
     char last_error[MAX_MENU_TITLE];
 
-    size_t opt_count;
+    int opt_count;
     MenuOption *opt;  // pointer to options array
-    size_t selected;
+    
+    Selection *sel;
 } Menu;
 
 // Menu functions
-Menu *create_menu(const char *title, int x, int y, int h, int w, size_t opt_count, MenuOption* opt);
+Menu *create_menu(const char *title, int x, int y, int h, int w, int opt_count, MenuOption* opt);
 void draw_menu(const Menu *menu);
 int run_menu(Menu *menu);
 int menu_selected(Menu *menu);
@@ -50,9 +53,10 @@ void convert_position(Cell position, int *y, int *x);
 Symbol* get_symbol(Player player);
 
 WINDOW* game_window(int y, int x);
-void draw_map(WINDOW* game_win, int y, int x);
-void place_symbol(WINDOW* game_win, Cell pos, Symbol* symb);
-void draw_symbols(WINDOW* game_win, Map map);
+void draw_grid(WINDOW* game_win);
+void draw_symbol(WINDOW* game_win, Cell pos, Symbol* symb);
+void draw_map(WINDOW* game_win, Map map);
+void draw_sel(WINDOW* game_win, Cell pos);
 
 
 #endif
