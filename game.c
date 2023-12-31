@@ -104,7 +104,7 @@ int run_gloop(GameLoop *gloop) {
             refresh();
             gloop->running = false;
         }
-        if (game->is_draw) {
+        else if (game->is_draw) {
             mvprintw(2, 5, "It is draw!");
             refresh();
             gloop->running = false;
@@ -113,6 +113,9 @@ int run_gloop(GameLoop *gloop) {
 
     timeout(-1);
 
+    mvprintw(0, 0, "Game end! To exit press F2 or q");
+    refresh();
+    
     while ((ch = getch()) != KEY_F(2) && ch != 'q');
 
     return 0;

@@ -36,12 +36,15 @@ int main(int argc, char* argv[]) {
         {GM_AI, "Against AI"},
         {GM_TWO, "Two players"},
         {GM_HOST_NET, "Host network game"},
-        {GM_JOIN_NET, "Join network game"}
+        {GM_JOIN_NET, "Join network game"},
+        {-1, "Exit to shell"}
     };
-    Menu *gm_menu = create_menu("Choose game mode", 0, 0, 20, 40, 4, gm_menu_opt);
+    Menu *gm_menu = create_menu("Choose game mode", 0, 0, 20, 40, 5, gm_menu_opt);
 
     int gm_mode;
-    while (true) {
+    bool game_running = true;
+
+    while (game_running) {
         if (run_menu(gm_menu) == -1) {
             break;
         }
@@ -53,6 +56,9 @@ int main(int argc, char* argv[]) {
             break;
         case GM_TWO:
             game_two();
+            break;
+        case -1:
+            game_running = false;
             break;
         default:
             menu_error(gm_menu, "Feature is not implemented");
@@ -96,7 +102,6 @@ int game_ai() {
 }
 
 int game_two() {
-    // todo: implement this
     Game *game = create_game(CROSS);
     GameLoop *gloop = create_gloop(game, CROSS);
     set_host_turn(gloop, (TurnFunc) keyboard_turn);
