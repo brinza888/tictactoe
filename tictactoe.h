@@ -6,7 +6,8 @@
 #include "utils.h"
 
 // size of game map (cant be changed)
-#define MAP_SIZE 3
+#define MAP_SIZE 4
+#define WIN_LINE 3
 
 #define E_NOTINMAP  888001
 #define E_NOTEMPTY  888002
@@ -36,6 +37,7 @@ const char *player_name(Player player);
 char field2char(FieldT field);
 FieldT char2field(char ch);
 Player switch_player(Player current);
+bool check_cell(Cell cell);
 
 Game *create_game(Player player);
 void destroy_game(Game *game);

@@ -40,6 +40,10 @@ Player switch_player(Player current) {
     return (current == CROSS) ? ZERO : CROSS;
 }
 
+bool check_cell(Cell cell) {
+    return cell.row < MAP_SIZE && cell.row >= 0 && cell.col < MAP_SIZE && cell.col >= 0;
+}
+
 
 Game *create_game(Player player) {
     Game *game = calloc(sizeof(Game), 1);
@@ -67,25 +71,39 @@ void destroy_game(Game *game) {
     free(game);
 }
 
+
+bool check_win_lines(const Map map, int row, int col) {
+    Player pl = map[row][col];
+    bool h = (col + (WIN_LINE - 1) < MAP_SIZE);
+    bool v = (row + (WIN_LINE - 1) < MAP_SIZE);
+    bool d1 = h && v;
+    bool d2 = v && (col - (WIN_LINE - 1) >= 0);
+
+    for (int d = 0; d < WIN_LINE; d++) {
+        if (h)
+            h = (map[row][col + d] == pl);
+        if (v)
+            v = (map[row + d][col] == pl);
+        if (d1)
+            d1 = (map[row + d][col + d] == pl);
+        if (d2)
+            d2 = (map[row + d][col - d] == pl);
+    }
+
+    return h || v || d1 || d2;
+}
+
 Player check_winner(const Map map) {
-    for (int i = 0; i < MAP_SIZE; i++) {  // horizontal lines
-        if (map[i][0] == map[i][1] && map[i][1] == map[i][2] && map[i][1] != EMPTY) {
-            return map[i][1];
+    for (int i = 0; i < MAP_SIZE; i++) {
+        for (int j = 0; j < MAP_SIZE; j++) {
+            if (map[i][j] != EMPTY) {
+                bool result = check_win_lines(map, i, j);
+                if (result)
+                    return map[i][j];
+            }
         }
     }
-    for (int i = 0; i < MAP_SIZE; i++) {  // vertical lines
-        if (map[0][i] == map[1][i] && map[1][i] == map[2][i] && map[1][i] != EMPTY) {
-            return map[1][i];
-        }
-    }
-    if ((map[0][0] == map[1][1] && map[1][1] == map[2][2]) ||
-		(map[0][2] == map[1][1] && map[1][1] == map[2][0]))  // diagonal check
-    {
-        if (map[1][1] != EMPTY) {
-            return map[1][1];
-        }
-    }
-    return EMPTY;  // winner not found
+    return false;
 }
 
 bool check_draw(const Map map) {
@@ -123,8 +141,7 @@ void print_map(const Map map) {  // pretty print for map
 }
 
 int check_turn(const Game *game, Cell turn) {
-    if (turn.row > MAP_SIZE - 1 || turn.row < 0 ||
-        turn.col > MAP_SIZE - 1 || turn.col < 0)
+    if (!check_cell(turn))
     {
         return E_NOTINMAP;
     }
