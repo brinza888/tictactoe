@@ -20,5 +20,7 @@ void ai_random(Map map, Cell* turn);
 
 int ai_turn(GameLoop *gloop, Cell *turn);
 
+#define AI_TURN ((TurnFunc) ai_turn)
+
 #endif
 

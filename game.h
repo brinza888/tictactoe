@@ -34,6 +34,7 @@ void destroy_gloop(GameLoop *gloop);
 
 int keyboard_turn(GameLoop *gloop, Cell *turn);
 
+#define KEYBOARD_TURN ((TurnFunc) keyboard_turn)
 
 #endif
 

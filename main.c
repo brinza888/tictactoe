@@ -17,6 +17,7 @@
 
 int game_ai();   // game with AI
 int game_two();  // game when two players use one PC
+Player choose_player(const char *title);
 
 
 int main(int argc, char* argv[]) {
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]) {
         {GM_JOIN_NET, "Join network game"},
         {-1, "Exit to shell"}
     };
+
     Menu *gm_menu = create_menu("Choose game mode", 0, 0, 20, 40, 5, gm_menu_opt);
 
     int gm_mode;
@@ -80,6 +82,10 @@ int game_ai() {
         {MODE_EXPERT, "Expert"}
     };
 
+    Player host_player, first_player; 
+    if ((host_player = choose_player("Choose host player")) == EMPTY) return -1;
+    if ((first_player = choose_player("Who makes turn first?")) == EMPTY) return -1;
+
     Menu *ai_mode_menu = create_menu("Choose AI mode", 0, 0, 20, 40, 4, ai_menu_opt);
     if (run_menu(ai_mode_menu) == -1) {
         destroy_menu(ai_mode_menu);
@@ -88,10 +94,11 @@ int game_ai() {
     set_ai_mode(menu_selected(ai_mode_menu));
     destroy_menu(ai_mode_menu);
 
-    Game *game = create_game(CROSS);
-    GameLoop *gloop = create_gloop(game, CROSS);
-    set_host_turn(gloop, (TurnFunc) keyboard_turn);
-    set_othr_turn(gloop, (TurnFunc) ai_turn);
+    Game *game = create_game(first_player);
+    GameLoop *gloop = create_gloop(game, host_player);
+
+    set_host_turn(gloop, KEYBOARD_TURN);
+    set_othr_turn(gloop, AI_TURN);
 
     int result = run_gloop(gloop);
 
@@ -102,10 +109,13 @@ int game_ai() {
 }
 
 int game_two() {
-    Game *game = create_game(CROSS);
-    GameLoop *gloop = create_gloop(game, CROSS);
-    set_host_turn(gloop, (TurnFunc) keyboard_turn);
-    set_othr_turn(gloop, (TurnFunc) keyboard_turn);
+    Player first_player;
+    if ((first_player = choose_player("Who makes turn first?")) == EMPTY) return -1;
+
+    Game *game = create_game(first_player);
+    GameLoop *gloop = create_gloop(game, first_player);
+    set_host_turn(gloop, KEYBOARD_TURN);
+    set_othr_turn(gloop, KEYBOARD_TURN);
 
     int result = run_gloop(gloop);
 
@@ -113,4 +123,16 @@ int game_two() {
     destroy_game(game);
 
     return result;
+}
+
+Player choose_player(const char *title) {
+    MenuOption player_opt[] = {
+        {CROSS, "Cross (X)"},
+        {ZERO, "Zero (O)"}
+    };
+    Menu *player_menu = create_menu(title, 0, 0, 20, 40, 2, player_opt);
+    if (run_menu(player_menu) == -1) {
+        return EMPTY;
+    }
+    return menu_selected(player_menu);
 }
