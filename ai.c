@@ -41,9 +41,6 @@ int ai_minimax(Map map, Player player, Cell *turn, int depth, int depthMax) {
     int mnmx = -100;
     int best = 0;
     int res, row, col;
-
-    if (turn != NULL)
-        clear();
     
     for (int i = 0; i < moves_count; i++) {
         row = moves[i].row;
@@ -61,18 +58,11 @@ int ai_minimax(Map map, Player player, Cell *turn, int depth, int depthMax) {
 
         map[row][col] = EMPTY;  // restore map state
 
-        if (turn != NULL) {
-            mvprintw(25 + i, 25, "Evaluation (%d, %d): %d", row, col, res);
-        }
-
         if (res > mnmx) {
             mnmx = res;
             best = i;
         }
     }
-
-    if (turn != NULL)
-        refresh();
 
     if (turn != NULL) {
         turn->row = moves[best].row;
