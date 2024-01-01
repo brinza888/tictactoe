@@ -11,28 +11,21 @@
 
 const int sideSize = MAP_SIZE * (CELL_SIZE + 1) + 1;
 
-Symbol SCROSS = {
+static Symbol SCROSS = {
     {' ', ' ', ' ', ' ', ' '},
     {' ', 'X', ' ', 'X', ' '},
     {' ', ' ', 'X', ' ', ' '},
     {' ', 'X', ' ', 'X', ' '},
     {' ', ' ', ' ', ' ', ' '}};
 
-Symbol SZERO = {
+static Symbol SZERO = {
     {' ', ' ', ' ', ' ', ' '},
     {' ', 'O', 'O', 'O', ' '},
     {' ', 'O', ' ', 'O', ' '},
     {' ', 'O', 'O', 'O', ' '},
     {' ', ' ', ' ', ' ', ' '}};
 
-Symbol SSEL = {
-    {'X', '\0', '\0', '\0', 'X'},
-    {'\0', '\0', '\0', '\0', '\0'},
-    {'\0', '\0', '\0', '\0', '\0'},
-    {'\0', '\0', '\0', '\0', '\0'},
-    {'X', '\0', '\0', '\0', 'X'}};
-
-Symbol SEMPTY = {
+static Symbol SEMPTY = {
     {' ', ' ', ' ', ' ', ' '},
     {' ', ' ', ' ', ' ', ' '},
     {' ', ' ', ' ', ' ', ' '},
@@ -217,8 +210,13 @@ void draw_map(WINDOW* game_win, Map map) {
 }
 
 void draw_sel(WINDOW* game_win, Cell pos) {
+    int y, x;
+    convert_position(pos, &y, &x);
     wattron(game_win, COLOR_PAIR(4));
-    draw_symbol(game_win, pos, &SSEL);
+    mvwaddch(game_win, y, x, ACS_ULCORNER);
+    mvwaddch(game_win, y, x + CELL_SIZE - 1, ACS_URCORNER);
+    mvwaddch(game_win, y + CELL_SIZE - 1, x, ACS_LLCORNER);
+    mvwaddch(game_win, y + CELL_SIZE - 1, x + CELL_SIZE - 1, ACS_LRCORNER);
     wattroff(game_win, COLOR_PAIR(4));
 }
 
