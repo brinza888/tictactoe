@@ -7,6 +7,7 @@
 
 // size of game map (cant be changed)
 #define MAP_SIZE 3
+#define WIN_LINE 3
 
 #define E_NOTINMAP  888001
 #define E_NOTEMPTY  888002
@@ -29,23 +30,23 @@ typedef struct _Game {
     Player player;
     Player winner;
     int turn_count;
+    Cell last_turn;
 } Game;
 
 const char *player_name(Player player);
-
-char field2char(FieldT field);
-FieldT char2field(char ch);
 Player switch_player(Player current);
+bool is_on_map(int row, int col);
+
+Map create_map();
+void destroy_map(Map map);
 
 Game *create_game(Player player);
 void destroy_game(Game *game);
-void print_map(const Map map);
 
-Player check_winner(const Map map);
+Player check_winner(const Map map, Cell last_turn);
 bool check_draw(const Map map);
 
 int check_turn(const Game *game, Cell turn);
-
 int make_turn(Game *game, Cell turn);
 void finalize_turn(Game *game);
 

@@ -6,8 +6,8 @@
 #include "utils.h"
 
 #define MODE_EASY 0
-#define MODE_MEDIUM 1
-#define MODE_HARD 2
+#define MODE_MEDIUM 2
+#define MODE_HARD 3
 #define MODE_EXPERT -1
 
 int get_moves(const Map map, Cell *moves);

@@ -5,6 +5,8 @@
 #include "ai.h"
 #include "utils.h"
 
+#include <ncurses.h>
+
 
 static int AI_Mode = MODE_EASY;
 
@@ -30,37 +32,51 @@ int get_moves(const Map map, Cell *moves) {
 }
 
 int ai_minimax(Map map, Player player, Cell *turn, int depth, int depthMax) {
-    Player winner = check_winner(map);
-    if (winner != EMPTY) {
-        return (winner == ZERO) ? 10 : -10;
-    }
-    if (check_draw(map) || (depthMax != -1 && depth > depthMax)) {
+    if (depthMax != -1 && depth > depthMax)
         return 0;
-    }
     
     Cell moves[MAP_SIZE * MAP_SIZE];
     int moves_count = get_moves(map, moves);
 
-    int best_move;
-    int mnmx = (player == ZERO) ? -20 : 20;  // optimized value
-    int res = 0;  // last minimax value
-    int row, col;   // make move
+    int mnmx = -100;
+    int best = 0;
+    int res, row, col;
+
+    if (turn != NULL)
+        clear();
     
     for (int i = 0; i < moves_count; i++) {
         row = moves[i].row;
         col = moves[i].col;
-        map[row][col] = player;  // asume player make turn with this move
-        res = ai_minimax(map, switch_player(player), NULL, depth + 1, depthMax);
-        map[row][col] = EMPTY;   // restore map to previous state
-        if ((player == ZERO && res > mnmx) || (player == CROSS && res < mnmx)) {
+
+        map[row][col] = player;  // assume player will make this move
+
+        Player winner = check_winner(map, moves[i]);
+        if (winner != EMPTY)
+            res = (winner == player) ? 10 - depth : depth - 10;  // use depth correction to avoid fast "give up"
+        else if (check_draw(map))
+            res = 0;
+        else
+            res = -ai_minimax(map, switch_player(player), NULL, depth + 1, depthMax);
+
+        map[row][col] = EMPTY;  // restore map state
+
+        if (turn != NULL) {
+            mvprintw(25 + i, 25, "Evaluation (%d, %d): %d", row, col, res);
+        }
+
+        if (res > mnmx) {
             mnmx = res;
-            best_move = i;
+            best = i;
         }
     }
 
+    if (turn != NULL)
+        refresh();
+
     if (turn != NULL) {
-        turn->row = moves[best_move].row;
-        turn->col = moves[best_move].col;
+        turn->row = moves[best].row;
+        turn->col = moves[best].col;
     }
 
     return mnmx;
