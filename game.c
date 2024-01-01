@@ -51,6 +51,9 @@ int run_gloop(GameLoop *gloop) {
     refresh();
     timeout(0);
 
+    int dy = 0;
+    int dx = 0;
+
     while (gloop->running) {
         gloop->enter_hit = false;
         turn_done = false;
@@ -65,8 +68,14 @@ int run_gloop(GameLoop *gloop) {
             case 'q':       gloop->running = false; break;
             case '\n':      gloop->enter_hit = true;    break;
         }
-        sel.row = sel_val(gloop->row);
-        sel.col = sel_val(gloop->col);
+        
+        if (ch != ERR) {
+            sel.row = sel_val(gloop->row);
+            sel.col = sel_val(gloop->col);
+            dy = -sel.row * CELL_SIZE;
+            dx = -sel.col * CELL_SIZE;
+            wclear(gloop->window);
+        }
 
         if (game->player == gloop->host_player) {
             if (gloop->host_turn(gloop, &turn) == 0) {
@@ -92,9 +101,9 @@ int run_gloop(GameLoop *gloop) {
             }
         }
 
-        draw_grid(gloop->window);
-        draw_map(gloop->window, game->map);
-        draw_sel(gloop->window, sel);
+        draw_grid(gloop->window, dy, dx);
+        draw_map(gloop->window, game->map, dy, dx);
+        draw_sel(gloop->window, sel, dy, dx);
         wrefresh(gloop->window);
 
         if (game->winner != EMPTY) {

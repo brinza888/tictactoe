@@ -48,10 +48,10 @@ void convert_position(Cell position, int *y, int *x);
 Symbol* get_symbol(Player player);
 
 WINDOW* game_window(int y, int x);
-void draw_grid(WINDOW* game_win);
-void draw_symbol(WINDOW* game_win, Cell pos, Symbol* symb);
-void draw_map(WINDOW* game_win, Map map);
-void draw_sel(WINDOW* game_win, Cell pos);
+void draw_grid(WINDOW* game_win, int y, int x);
+void draw_symbol(WINDOW* game_win, Cell pos, Symbol* symb, int dy, int dx);
+void draw_map(WINDOW* game_win, Map map, int dy, int dx);
+void draw_sel(WINDOW* game_win, Cell pos, int dy, int dx);
 
 
 #endif

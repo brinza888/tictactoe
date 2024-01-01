@@ -138,8 +138,7 @@ void convert_position(Cell pos, int *y, int *x) {
     *y = 1 + pos.row * (CELL_SIZE + 1); 
 }
 
-void draw_grid(WINDOW* game_win) {
-    int y = 0, x = 0;
+void draw_grid(WINDOW* game_win, int y, int x) {
     for (int j = 0; j < sideSize; j++) { 
         for (int i = 0; i < sideSize; i++) {
             if (j == 0 || j == sideSize - 1) {
@@ -187,9 +186,11 @@ Symbol* get_symbol(Player player) {
     }
 }
 
-void draw_symbol(WINDOW* game_win, Cell pos, Symbol* symb) {
+void draw_symbol(WINDOW* game_win, Cell pos, Symbol* symb, int dy, int dx) {
     int y, x;
     convert_position(pos, &y, &x);
+    y += dy;
+    x += dx;
     for (int i = 0; i < CELL_SIZE; i++) {
         for (int j = 0; j < CELL_SIZE; j++) {
             if ((*symb)[i][j] == '\0') {
@@ -200,18 +201,20 @@ void draw_symbol(WINDOW* game_win, Cell pos, Symbol* symb) {
     }
 }
 
-void draw_map(WINDOW* game_win, Map map) {
+void draw_map(WINDOW* game_win, Map map, int dy, int dx) {
     for (int i = 0; i < MAP_SIZE; i++) {
         for (int j = 0; j < MAP_SIZE; j++) {
             Symbol* symb = get_symbol(map[i][j]);
-            draw_symbol(game_win, make_cell(i, j), symb);
+            draw_symbol(game_win, make_cell(i, j), symb, dy, dx);
         }
     }
 }
 
-void draw_sel(WINDOW* game_win, Cell pos) {
+void draw_sel(WINDOW* game_win, Cell pos, int dy, int dx) {
     int y, x;
     convert_position(pos, &y, &x);
+    y += dy;
+    x += dx;
     wattron(game_win, COLOR_PAIR(4));
     mvwaddch(game_win, y, x, ACS_ULCORNER);
     mvwaddch(game_win, y, x + CELL_SIZE - 1, ACS_URCORNER);
