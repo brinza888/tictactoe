@@ -72,8 +72,8 @@ int run_gloop(GameLoop *gloop) {
         if (ch != ERR) {
             sel.row = sel_val(gloop->row);
             sel.col = sel_val(gloop->col);
-            dy = -sel.row * CELL_SIZE;
-            dx = -sel.col * CELL_SIZE;
+            // dy = -sel.row * CELL_SIZE;
+            // dx = -sel.col * CELL_SIZE;
             wclear(gloop->window);
         }
 
