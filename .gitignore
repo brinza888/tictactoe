@@ -1,9 +1,5 @@
 bin/
 .idea
-tictactoe
-*.o
 *.vim
-ttt_console
-ttt_tgui
-ttt
-
+.vscode
+build

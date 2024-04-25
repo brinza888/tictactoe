@@ -1,33 +1,35 @@
-CC = gcc
-CFLAGS = -Wall
+CC := gcc
+CFLAGS := -Wall
+LDFLAGS := -lncurses
 
-BIN = bin/
-EXE = ttt
+PREFIX = /usr
+DESTDIR = $(PREFIX)/bin/
 
-SOURCES = tictactoe.c ai.c tgui.c main.c
+SRC := src/
+BIN := bin/
+EXE := ttt
+
+SOURCES = tictactoe.c ai.c tgui.c game.c main.c utils.c
 OBJECTS = $(addprefix $(BIN), $(SOURCES:.c=.o))
+EXE := $(addprefix $(BIN), $(EXE))
 
 .PHONY: all
 all: $(EXE)
 
-.PHONY: clean
-clean:
-	rm -rf $(BIN) $(EXE)
-
-.PHONY: run
-run: $(EXE)
-	./$(EXE)
-
-.PHONY: window
-window: $(EXE)
-	gnome-terminal -- ./$(EXE)
+.PHONY: install
+install: $(EXE)
+	install -m 755 $(EXE) $(DESTDIR)
 
 $(EXE): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -lncurses -o $(EXE)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(EXE) $(LDFLAGS)
 
-$(BIN)%.o: %.c $(BIN)
+$(BIN)%.o: $(SRC)%.c $(BIN)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BIN):
-	mkdir -p $(BIN)
+	@mkdir -p $(BIN)
+
+.PHONY: clean
+clean:
+	rm -rf $(BIN)
 
