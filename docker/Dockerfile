@@ -7,7 +7,7 @@ RUN adduser -h /home/ttt -s /usr/bin/ttt -D ttt
 RUN passwd -d ttt
 
 COPY docker/rootfs/ /
-COPY src/ /home/ttt/
+COPY src/ /home/ttt/src/
 COPY Makefile /home/ttt/
 
 WORKDIR /home/ttt
