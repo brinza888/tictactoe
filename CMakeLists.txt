@@ -1,22 +1,26 @@
-cmake_minimum_required(VERSION 3.25)
+# Was in use only for building project on Windows
+
+cmake_minimum_required(VERSION 3.2)
 
 project(ttt)
 
 set(CMAKE_C_STANDARD 99)
 
-include(FindCurses)
+set(CURSES_NEED_NCURSES TRUE)
 
-add_executable(${PROJECT_NAME}
-    main.c
-    game.c
-    ai.c
-    tgui.c
-    tictactoe.c
-    utils.c
-)
-
-target_link_libraries(${PROJECT_NAME} ${CURSES_LIBRARIES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${CURSES_INCLUDE_DIRS}/ncurses)
-target_link_options(${PROJECT_NAME} PRIVATE -static)
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIR})
 
 add_definitions(-DNCURSES_STATIC)
+
+add_executable(${PROJECT_NAME}
+    src/main.c
+    src/game.c
+    src/ai.c
+    src/tgui.c
+    src/tictactoe.c
+    src/utils.c
+)
+
+target_link_libraries(${PROJECT_NAME} ncurses)
+
