@@ -14,9 +14,11 @@
 #define GM_TWO 1
 #define GM_HOST_NET 2
 #define GM_JOIN_NET 3
+#define GM_LOOPBACK 4
 
 int game_ai();   // game with AI
 int game_two();  // game when two players use one PC
+int game_loopback();  // multiplayer game on local machine
 Player choose_player(const char *title);
 
 
@@ -36,6 +38,7 @@ int main(int argc, char* argv[]) {
     MenuOption gm_menu_opt[] = {
         {GM_AI, "Against AI"},
         {GM_TWO, "Two players"},
+        {GM_LOOPBACK, "Local multiplayer"},
         {GM_HOST_NET, "Host network game"},
         {GM_JOIN_NET, "Join network game"},
         {-1, "Exit to shell"}
@@ -59,11 +62,14 @@ int main(int argc, char* argv[]) {
         case GM_TWO:
             game_two();
             break;
+        case GM_LOOPBACK:
+            game_loopback();
+            break;
         case -1:
             game_running = false;
             break;
         default:
-            menu_error(gm_menu, "Feature is not implemented");
+            menu_error(gm_menu, "Feature is not implemented or restricted");
             break;
         }
     }
@@ -121,6 +127,15 @@ int game_two() {
 
     destroy_gloop(gloop);
     destroy_game(game);
+
+    return result;
+}
+
+int game_loopback() {
+
+    Game *game = create_game(first_player);
+
+    int result = 0;
 
     return result;
 }
