@@ -10,6 +10,7 @@ set(CURSES_NEED_NCURSES TRUE)
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
+include_directories(${CURSES_INCLUDE_DIR}/ncurses)
 
 add_definitions(-DNCURSES_STATIC)
 
