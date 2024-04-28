@@ -4,52 +4,29 @@
 
 #include <sys/ipc.h>
 #include <sys/types.h>
-#include <sys/shm.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
 
 #include "lobby.h"
 
-static const char SHMEM_FILE[] = "/var/run/ttt_lmgr.shmem";
-static const int SHMEM_ID = 0x14;
-static const mode_t SHMEM_MODE = 0644;
-static const size_t SHMEM_SIZE = sizeof(LobbyManager);
-static int shmid = -1;
 
-LobbyManager *lmgr_get() {
-    if (access(SHMEM_FILE, F_OK) != 0) {
-        creat(SHMEM_FILE, SHMEM_MODE);
+static const char FIFO_PREFIX_PATH[] = "/var/run/ttt";
+
+
+void check_lobby_path() {
+    if (access(FIFO_PREFIX_PATH, R_OK | W_OK | X_OK) == -1) {
+        mkdir(FIFO_PREFIX_PATH, S_IRWXU);
     }
-    key_t ipc_key = ftok(SHMEM_FILE, SHMEM_ID);
-    shmid = shmget(ipc_key, SHMEM_SIZE, IPC_CREAT | SHMEM_MODE);
-    if (shmid == -1) {
-        perror("Unable to access shared memory region with LobbyManager");
-        return NULL;
-    }
-    LobbyManager *lmgr = shmat(shmid, NULL, 0);
-    if (lmgr == (void*) -1) {
-        perror("Unable to access shared memory region with LobbyManager");
-        return NULL;
-    }
-    return lmgr;
 }
 
-bool lmgr_need_remove(LobbyManager *lmgr) {
-    bool flag = true;
-    for (size_t i = 0; i < MAX_LOBBIES; i++) {
-        flag = flag && (lmgr->lobbies[i].status == LS_CLOSE);
-    }
-    return flag;
+int try_get_lobby(Lobby *lobby) {
+    DIR *dir = opendir(FIFO_PREFIX_PATH);
+    struct dirent ent;
+    while ((ent = readdir(dir)) ) 
 }
 
-void lmgr_free(LobbyManager *lmgr) {
-    bool need_remove = false;
-    if (lmgr_need_remove(lmgr)) {
-        need_remove = true;
-    }
-    shmdt(lmgr);
-}
-
-Lobby *get_lobbies(LobbyManager *lmgr, int status) {
+int create_new_lobby(Lobby *lobby) {
 
 }
