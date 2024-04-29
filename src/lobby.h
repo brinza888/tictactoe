@@ -4,9 +4,6 @@
 #include "tictactoe.h"
 #include "game.h"
 
-#define CODE_LEN 8
-#define MAX_PATH_LEN 256
-
 void init_loopback();
 void close_loopback();
 
