@@ -8,17 +8,18 @@
 #include "ai.h"
 #include "game.h"
 #include "tgui.h"
+#include "lobby.h"
 
 
 #define GM_AI 0
 #define GM_TWO 1
 #define GM_HOST_NET 2
 #define GM_JOIN_NET 3
-#define GM_LOOPBACK 4
 
 int game_ai();   // game with AI
 int game_two();  // game when two players use one PC
-int game_loopback();  // multiplayer game on local machine
+int game_host_net();
+int game_join_net();
 Player choose_player(const char *title);
 
 
@@ -38,9 +39,8 @@ int main(int argc, char* argv[]) {
     MenuOption gm_menu_opt[] = {
         {GM_AI, "Against AI"},
         {GM_TWO, "Two players"},
-        {GM_LOOPBACK, "Local multiplayer"},
-        {GM_HOST_NET, "Host network game"},
-        {GM_JOIN_NET, "Join network game"},
+        {GM_HOST_NET, "Host game"},
+        {GM_JOIN_NET, "Join game"},
         {-1, "Exit to shell"}
     };
 
@@ -62,8 +62,11 @@ int main(int argc, char* argv[]) {
         case GM_TWO:
             game_two();
             break;
-        case GM_LOOPBACK:
-            game_loopback();
+        case GM_HOST_NET:
+            game_host_net();
+            break;
+        case GM_JOIN_NET:
+            game_join_net();
             break;
         case -1:
             game_running = false;
@@ -131,11 +134,36 @@ int game_two() {
     return result;
 }
 
-int game_loopback() {
+int game_host_net() {
+    init_loopback();
+    host_game();
 
-    Game *game = create_game(first_player);
+    Game *game = create_game(CROSS);
 
-    int result = 0;
+    GameLoop *gloop = create_gloop(game, CROSS);
+    set_host_turn(gloop, LB_TURN);
+    set_othr_turn(gloop, LB_OTHER_TURN);
+
+    int result = run_gloop(gloop);
+
+    close_loopback();
+
+    return result;
+}
+
+int game_join_net() {
+    init_loopback();
+    join_game();
+
+    Game *game = create_game(CROSS);
+
+    GameLoop *gloop = create_gloop(game, ZERO);
+    set_host_turn(gloop, LB_TURN);
+    set_othr_turn(gloop, LB_OTHER_TURN);
+
+    int result = run_gloop(gloop);
+
+    close_loopback();
 
     return result;
 }

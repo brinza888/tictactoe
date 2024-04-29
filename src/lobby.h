@@ -4,15 +4,19 @@
 #include "tictactoe.h"
 #include "game.h"
 
+#define CODE_LEN 8
+#define MAX_PATH_LEN 256
 
-typedef struct Lobby {
-    time_t lobby_id;
-} Lobby;
+void init_loopback();
+void close_loopback();
 
+int host_game();
+int join_game();
 
-void check_lobby_path();
-int try_get_lobby(Lobby *lobby);
-int create_new_lobby(Lobby *lobby);
+int loopback_turn(GameLoop *gloop, Cell *turn);
+int loopback_other_turn(GameLoop *gloop, Cell *turn);
 
+#define LB_TURN ((TurnFunc) loopback_turn)
+#define LB_OTHER_TURN ((TurnFunc) loopback_other_turn)
 
 #endif
