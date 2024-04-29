@@ -49,7 +49,7 @@ int run_gloop(GameLoop *gloop) {
 
     clear();
     refresh();
-    timeout(0);
+    timeout(-1);
 
     int dy = 0;
     int dx = 0;
