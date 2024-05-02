@@ -8,7 +8,7 @@
 #include "ai.h"
 #include "game.h"
 #include "tgui.h"
-#include "lobby.h"
+#include "loopback.h"
 
 
 #define GM_AI 0

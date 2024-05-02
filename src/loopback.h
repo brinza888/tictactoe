@@ -1,5 +1,5 @@
-#ifndef __LOBBY_H
-#define __LOBBY_H
+#ifndef __LOOPBACK_H
+#define __LOOPBACK_H
 
 #include "tictactoe.h"
 #include "game.h"

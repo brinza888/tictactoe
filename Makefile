@@ -11,7 +11,7 @@ SRC := src
 OBJ := obj
 BIN := bin
 
-SOURCES := tictactoe.c ai.c tgui.c game.c main.c lobby.c utils.c
+SOURCES := tictactoe.c ai.c tgui.c game.c main.c loopback.c utils.c
 OBJECTS := $(addprefix $(OBJ)/, $(SOURCES:.c=.o))
 TARGET := $(BIN)/$(EXENAME)
 

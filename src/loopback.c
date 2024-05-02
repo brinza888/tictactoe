@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "lobby.h"
+#include "loopback.h"
 #include "utils.h"
 
 static const char DIR_PATH[] = "/tmp/ttt";
