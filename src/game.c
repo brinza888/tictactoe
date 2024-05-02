@@ -49,7 +49,8 @@ int run_gloop(GameLoop *gloop) {
 
     clear();
     refresh();
-    timeout(-1);
+    flushinp();
+    timeout(1);
 
     int dy = 0;
     int dx = 0;
@@ -120,10 +121,9 @@ int run_gloop(GameLoop *gloop) {
         }
     }
 
-    timeout(-1);
-
     mvprintw(0, 0, "Game end! To exit press F2 or q");
     refresh();
+    timeout(-1);
     
     while ((ch = getch()) != KEY_F(2) && ch != 'q');
 

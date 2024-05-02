@@ -47,8 +47,8 @@ int host_game() {
 }
 
 int join_game() {
-    read_fd = open(FIFO_HOST, O_RDONLY | O_NONBLOCK);
     write_fd = open(FIFO_CLNT, O_WRONLY);
+    read_fd = open(FIFO_HOST, O_RDONLY | O_NONBLOCK);
     return 0;
 }
 
@@ -57,7 +57,6 @@ int loopback_turn(GameLoop *gloop, Cell *turn) {
     if (res == 0) {
         if (write(write_fd, turn, sizeof(Cell)) == -1) {
             perror("Unable to write Cell in fifo");
-            endwin();
         }
     }
     return res;
@@ -67,10 +66,6 @@ int loopback_other_turn(GameLoop *gloop, Cell *turn) {
     int retval = read(read_fd, turn, sizeof(Cell));
     if (retval > 0) {
         return 0;
-    }
-    if (retval == -1) {
-        perror("Unable to read Cell from fifo");
-        endwin();
     }
     return 1;
 }
