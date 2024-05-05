@@ -10,16 +10,16 @@
 #include "tgui.h"
 #include "loopback.h"
 
-
 #define GM_AI 0
 #define GM_TWO 1
 #define GM_HOST_NET 2
 #define GM_JOIN_NET 3
+#define GM_LOOPBACK 4
 
 int game_ai();   // game with AI
 int game_two();  // game when two players use one PC
-int game_host_net();
-int game_join_net();
+int game_loopback();  // game on same host but different processes (terminals)
+
 Player choose_player(const char *title);
 
 
@@ -39,17 +39,18 @@ int main(int argc, char* argv[]) {
     MenuOption gm_menu_opt[] = {
         {GM_AI, "Against AI"},
         {GM_TWO, "Two players"},
-        {GM_HOST_NET, "Host game"},
-        {GM_JOIN_NET, "Join game"},
+        {GM_LOOPBACK, "Multiplayer"},
         {-1, "Exit to shell"}
     };
 
-    Menu *gm_menu = create_menu("Choose game mode", 0, 0, 20, 40, 5, gm_menu_opt);
+    Menu *gm_menu = create_menu("Choose game mode", 0, 0, 20, 40, 4, gm_menu_opt);
 
     int gm_mode;
     bool game_running = true;
 
     while (game_running) {
+        int ret;
+
         if (run_menu(gm_menu) == -1) {
             break;
         }
@@ -62,11 +63,11 @@ int main(int argc, char* argv[]) {
         case GM_TWO:
             game_two();
             break;
-        case GM_HOST_NET:
-            game_host_net();
-            break;
-        case GM_JOIN_NET:
-            game_join_net();
+        case GM_LOOPBACK:
+            ret = game_loopback();
+            if (ret == -1) {
+                menu_error(gm_menu, "Unable to join/host loopback game");
+            }
             break;
         case -1:
             game_running = false;
@@ -134,35 +135,33 @@ int game_two() {
     return result;
 }
 
-int game_host_net() {
-    init_loopback();
-    host_game();
+int game_loopback() {
+    if (init_loopback() == -1) {
+        return -1;
+    }
+    
+    Game *game;
+    GameLoop *gloop;        
 
-    Game *game = create_game(CROSS);
-
-    GameLoop *gloop = create_gloop(game, CROSS);
-    set_host_turn(gloop, LB_TURN);
-    set_othr_turn(gloop, LB_OTHER_TURN);
-
-    int result = run_gloop(gloop);
-
-    close_loopback();
-
-    return result;
-}
-
-int game_join_net() {
-    init_loopback();
-    join_game();
-
-    Game *game = create_game(CROSS);
-
-    GameLoop *gloop = create_gloop(game, ZERO);
-    set_host_turn(gloop, LB_TURN);
-    set_othr_turn(gloop, LB_OTHER_TURN);
+    if (join_game() == 0) {
+        game = create_game(CROSS);
+        gloop = create_gloop(game, ZERO);
+    }
+    else {
+        if (host_game() == -1) {
+            return -1;
+        }
+        game = create_game(CROSS);
+        gloop = create_gloop(game, CROSS);
+    }
+    
+    set_host_turn(gloop, LB_MAKE_TURN);
+    set_othr_turn(gloop, LB_WAIT_TURN);
 
     int result = run_gloop(gloop);
 
+    destroy_gloop(gloop);
+    destroy_game(game);
     close_loopback();
 
     return result;
