@@ -1,35 +1,42 @@
 CC := gcc
-CFLAGS := -Wall
+CFLAGS ?= -Wall
 LDFLAGS := -lncurses
 
-PREFIX = /usr
-DESTDIR = $(PREFIX)/bin/
+PREFIX ?= /usr/local
+DESTDIR = $(PREFIX)/bin
 
-SRC := src/
-BIN := bin/
-EXE := ttt
+EXENAME := tictactoe
 
-SOURCES = tictactoe.c ai.c tgui.c game.c main.c utils.c
-OBJECTS = $(addprefix $(BIN), $(SOURCES:.c=.o))
-EXE := $(addprefix $(BIN), $(EXE))
+SRC := src
+OBJ := obj
+BIN := bin
 
-.PHONY: all
-all: $(EXE)
+SOURCES := tictactoe.c ai.c tgui.c game.c main.c utils.c
+OBJECTS := $(addprefix $(OBJ)/, $(SOURCES:.c=.o))
+TARGET := $(BIN)/$(EXENAME)
 
-.PHONY: install
-install: $(EXE)
-	install -m 755 $(EXE) $(DESTDIR)
+all: $(TARGET)
 
-$(EXE): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(EXE) $(LDFLAGS)
+install: $(TARGET)
+	@mkdir -p $(DESTDIR)
+	@install -m 755 $(TARGET) $(DESTDIR)
 
-$(BIN)%.o: $(SRC)%.c $(BIN)
+uninstall:
+	@rm -f $(DESTDIR)/$(EXENAME)
+
+$(TARGET): $(OBJECTS) | $(BIN)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
+
+$(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BIN):
 	@mkdir -p $(BIN)
 
-.PHONY: clean
-clean:
-	rm -rf $(BIN)
+$(OBJ):
+	@mkdir -p $(OBJ)
 
+clean:
+	@rm -rf $(BIN) $(OBJ)
+
+.PHONY: all install uninstall clean
