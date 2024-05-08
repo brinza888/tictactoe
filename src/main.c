@@ -134,5 +134,7 @@ Player choose_player(const char *title) {
     if (run_menu(player_menu) == -1) {
         return EMPTY;
     }
-    return menu_selected(player_menu);
+    Player choosen = (Player) menu_selected(player_menu);
+    destroy_menu(player_menu);
+    return choosen;
 }
