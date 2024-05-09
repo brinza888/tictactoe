@@ -116,12 +116,12 @@ int join_game() {
 
 int loopback_make_turn(GameLoop *gloop, Cell *turn) {
     int res = keyboard_turn(gloop, turn);
-    lock_sem(semid);
     if (res == 0) {
+        lock_sem(semid);
         memcpy(&slot->turn, turn, sizeof(Cell));
         slot->turn_done = true;
+        release_sem(semid)
     }
-    release_sem(semid)
     return res;
 }
 
