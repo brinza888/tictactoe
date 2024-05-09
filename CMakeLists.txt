@@ -21,6 +21,7 @@ add_executable(${PROJECT_NAME}
     src/tgui.c
     src/tictactoe.c
     src/utils.c
+    src/loopback.c
 )
 
 target_link_libraries(${PROJECT_NAME} ncurses)
