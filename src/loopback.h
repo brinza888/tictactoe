@@ -21,7 +21,7 @@ typedef struct _GameSlot {
 } GameSlot;
 
 typedef struct _GameInfo {
-    int attached;
+    pthread_mutex_t mutex;
     GameSlot slots[MAX_SLOTS];
 } GameInfo;
 
