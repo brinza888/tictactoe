@@ -7,7 +7,6 @@
 #include "game.h"
 
 #define MAX_SLOTS 64
-#define MAX_PATH 256
 
 typedef enum _SlotState {
     SS_EMPTY,
@@ -23,6 +22,7 @@ typedef struct _GameSlot {
 } GameSlot;
 
 typedef struct _GameInfo {
+    bool initialized;
     pthread_mutex_t mutex;
     GameSlot slots[MAX_SLOTS];
 } GameInfo;

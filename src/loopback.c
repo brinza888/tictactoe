@@ -25,10 +25,8 @@ static bool is_host = false;
 
 
 int init_loopback() {
-    bool init_shmem = false;
     if (access(SHM_PATH, R_OK | W_OK) != 0) {
         creat(SHM_PATH, 0666);
-        init_shmem = true;
     }
     key_t shm_key = ftok(SHM_PATH, SHM_PROJ);
     if ((shmid = shmget(shm_key, sizeof(GameInfo), IPC_CREAT | 0666)) == -1) {
@@ -39,11 +37,12 @@ int init_loopback() {
         perror("Unable to shmat");
         return -1;
     }
-    if (init_shmem) {
+    if (!game_info->initialized) {
         pthread_mutexattr_t attr;
         pthread_mutexattr_init(&attr);
         pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
         pthread_mutex_init(&game_info->mutex, &attr);
+        game_info->initialized = true;
     }
     return 0;
 }
