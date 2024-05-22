@@ -9,7 +9,6 @@
 #include <sys/shm.h>
 #include <sys/stat.h>
 #include <signal.h>
-#include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -31,7 +30,6 @@ int init_loopback() {
         creat(SHM_PATH, 0666);
         init_shmem = true;
     }
-    
     key_t shm_key = ftok(SHM_PATH, SHM_PROJ);
     if ((shmid = shmget(shm_key, sizeof(GameInfo), IPC_CREAT | 0666)) == -1) {
         perror("Unable to shmget");
@@ -51,11 +49,11 @@ int init_loopback() {
 }
 
 void close_loopback() {
-    pthread_mutex_lock(&game_info->mutex);
     if (is_host && slot != NULL) {
+        pthread_mutex_lock(&game_info->mutex);
         slot->state = SS_EMPTY;
+        pthread_mutex_unlock(&game_info->mutex);
     }
-    pthread_mutex_unlock(&game_info->mutex);
     shmctl(shmid, IPC_RMID, NULL);
     shmdt(game_info);
 }
@@ -69,11 +67,10 @@ int host_game() {
             break;
         }
     }
-    pthread_mutex_unlock(&game_info->mutex);
     if (slot == NULL) {
+        pthread_mutex_unlock(&game_info->mutex);
         return -1;  // no available slots to host game
     }
-    pthread_mutex_lock(&game_info->mutex);
     slot->state = SS_WAIT;
     slot->turn_done = false;
     slot->move_maker = CROSS;
@@ -90,11 +87,10 @@ int join_game() {
             break;
         }
     }
-    pthread_mutex_unlock(&game_info->mutex);
     if (slot == NULL) {
+        pthread_mutex_unlock(&game_info->mutex);
         return -1;  // no slots to join
     }
-    pthread_mutex_lock(&game_info->mutex);
     slot->state = SS_GAME;
     is_host = false;
     pthread_mutex_unlock(&game_info->mutex);

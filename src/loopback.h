@@ -1,6 +1,8 @@
 #ifndef __LOOPBACK_H
 #define __LOOPBACK_H
 
+#include <pthread.h>
+
 #include "tictactoe.h"
 #include "game.h"
 
