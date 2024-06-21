@@ -1,6 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -pthread
 LDFLAGS := -lncurses
+INCLUDE := -I include
 
 PREFIX ?= /usr/local
 DESTDIR = $(PREFIX)/bin
@@ -25,10 +26,10 @@ uninstall:
 	@rm -f $(DESTDIR)/$(EXENAME)
 
 $(TARGET): $(OBJECTS) | $(BIN)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDE) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 $(BIN):
 	@mkdir -p $(BIN)
