@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.2)
 
-project(ttt)
+project(tictactoe)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -23,6 +23,8 @@ add_executable(${PROJECT_NAME}
     src/utils.c
     src/loopback.c
 )
+
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 target_link_libraries(${PROJECT_NAME} ncurses)
 
