@@ -14,4 +14,4 @@ X11Forwarding no
 HostKey /etc/ssh/keys/ssh_host_rsa_key
 
 Match User ttt
-  ForceCommand /usr/bin/ttt
+  ForceCommand /usr/local/bin/tictactoe
